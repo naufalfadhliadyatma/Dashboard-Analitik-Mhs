@@ -56,8 +56,7 @@ const SidebarLayout = () => {
       `}>
         {/* Logo Area */}
         <div className="p-6 flex justify-center items-center border-b border-white/10">
-          {/* GANTI: Ubah src berikut dengan path gambar logo UAD */}
-          <img src="/assets/logo-uad.png" alt="Logo UAD" className="h-12 w-auto object-contain bg-white/10 p-2 rounded-lg" />
+          <img src="src/assets/logo-uad.png" alt="Logo UAD" className="h-20 w-auto object-contain bg-white-0 p-0 rounded-lg" />
         </div>
 
         {/* Navigation */}

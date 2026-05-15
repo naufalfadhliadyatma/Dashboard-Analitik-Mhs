@@ -33,10 +33,19 @@ const Login = () => {
   };
 
   return (
-    <div className="card w-full p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div
+      className="card w-full p-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+      style={{ 
+        background: 'linear-gradient(145deg, #FFFFFF 0%, #9CCDDB 40%, #5790AB 100%)',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
+        borderRadius: '24px',
+        backdropFilter: 'blur(0px)',
+        transition: 'all 0.3s ease'
+      }}
+    >
       <div className="flex flex-col items-center mb-8">
         {/* GANTI: Ubah src berikut dengan path gambar logo UAD */}
-        <img src="/assets/logo-uad.png" alt="Logo UAD" className="h-16 mb-6 object-contain" />
+        <img src="src/assets/logo-uad.png" alt="Logo UAD" className="h-16 mb-6 object-contain" />
         <h1 className="text-2xl font-bold text-accent2 text-center">Masuk ke Sistem</h1>
         <p className="text-text-muted text-sm mt-2 text-center">
           Dashboard Analitik & Monitoring Mahasiswa Sistem Informasi

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { UploadCloud, File, X, CheckCircle2 } from 'lucide-react';
+import { UploadCloud, File, X, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 // ============ [PAGE SECTION] ============
 // [KOMPONEN] Upload - Halaman khusus Admin untuk mengunggah data mahasiswa berformat CSV
