@@ -95,7 +95,7 @@ const StatCard = ({ label, value, color, icon: Icon, delay }) => (
       <Icon size={20} style={{ color: color.text }} />
     </div>
     <div>
-      <p style={{ fontSize: '24px', fontWeight: '700', color: '#06446B', margin: 0, lineHeight: 1.1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{value}</p>
+      <p style={{ fontSize: '24px', fontWeight: '700', color: '#06446B', margin: 0, lineHeight: 1.1, fontFamily: "'Poppins', sans-serif" }}>{value}</p>
       <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0', fontWeight: '500', letterSpacing: '0.01em' }}>{label}</p>
     </div>
   </div>
@@ -110,7 +110,7 @@ const CapstoneBadge = ({ status }) => {
       background: cfg.bg, border: `1px solid ${cfg.border}`,
       borderRadius: '20px', fontSize: '12px', fontWeight: '600',
       color: cfg.text, letterSpacing: '0.01em', whiteSpace: 'nowrap',
-      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      fontFamily: "'Poppins', sans-serif",
     }}>
       <span style={{
         width: '6px', height: '6px', borderRadius: '50%',
@@ -199,7 +199,7 @@ const Capstone = () => {
           color: #64748b;
           cursor: pointer;
           transition: all 0.18s ease;
-          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-family: 'Poppins';
           white-space: nowrap;
         }
         .capstone-filter-btn:hover {
@@ -216,7 +216,7 @@ const Capstone = () => {
       `}</style>
 
       <div style={{
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        fontFamily: "'Poppins', sans-serif",
         minHeight: '100%',
         animation: 'fadeIn 0.4s ease',
         display: 'flex',
@@ -240,7 +240,7 @@ const Capstone = () => {
             </div>
             <div>
               <h1 style={{
-                fontSize: '22px', fontWeight: '800',
+                fontSize: '22px', fontWeight: '900',
                 background: 'linear-gradient(135deg, #06446B 30%, #5790AB 100%)',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text', margin: 0, lineHeight: 1.2,
@@ -344,7 +344,7 @@ const Capstone = () => {
                     border: '1px solid rgba(156,205,219,0.25)',
                     borderRadius: '10px',
                     transition: 'all 0.2s ease',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                   onFocus={e => {
                     e.target.style.background = '#fff';
@@ -382,7 +382,7 @@ const Capstone = () => {
                     borderRadius: '10px',
                     appearance: 'none',
                     cursor: 'pointer',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Poppins', sans-serif",
                     transition: 'all 0.2s ease',
                   }}
                   onFocus={e => {
@@ -469,7 +469,7 @@ const Capstone = () => {
                       {/* NIM */}
                       <td style={{ padding: '14px 20px', whiteSpace: 'nowrap' }}>
                         <span style={{
-                          fontFamily: "'Plus Jakarta Sans', sans-serif",
+                          fontFamily: "'Poppins', sans-serif",
                           fontWeight: '700', fontSize: '13px',
                           color: '#06446B', letterSpacing: '0.02em',
                         }}>

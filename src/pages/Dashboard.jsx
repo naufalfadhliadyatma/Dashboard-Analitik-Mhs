@@ -101,7 +101,7 @@ const StatsCard = ({ title, value, icon: Icon, trend, trendLabel, accent, delay 
         <h3 style={{
           fontSize: '2rem', fontWeight: 800, color: T.ink,
           margin: 0, lineHeight: 1.1, letterSpacing: '-0.02em',
-          fontFamily: '"Plus Jakarta Sans", "DM Sans", system-ui, sans-serif',
+          fontFamily: '"Poppins", "DM Sans", system-ui, sans-serif',
         }}>{value}</h3>
       </div>
 
@@ -164,7 +164,7 @@ const ChartCard = ({ title, subtitle, children, fullWidth = false, delay = 0 }) 
       <div>
         <h3 style={{
           fontSize: '15px', fontWeight: 700, color: T.ink, margin: 0,
-          fontFamily: '"Plus Jakarta Sans", "DM Sans", system-ui, sans-serif',
+          fontFamily: '"Poppins", "DM Sans", system-ui, sans-serif',
           letterSpacing: '-0.01em',
         }}>{title}</h3>
         <p style={{ fontSize: '12px', color: T.muted, margin: '4px 0 0' }}>{subtitle}</p>
@@ -206,7 +206,7 @@ const PageHeader = ({ filterAngkatan, setFilterAngkatan }) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { const t = setTimeout(() => setMounted(true), 40); return () => clearTimeout(t); }, []);
 
-  const angkatan = ['Semua', '2022', '2021', '2020', '2019'];
+  const angkatan = ['Semua', '2023', '2022', '2021', '2020'];
 
   return (
     <div style={{
@@ -246,7 +246,7 @@ const PageHeader = ({ filterAngkatan, setFilterAngkatan }) => {
           <h1 style={{
             fontSize: '1.75rem', fontWeight: 800, color: '#fff', margin: 0,
             lineHeight: 1.15, letterSpacing: '-0.03em',
-            fontFamily: '"Plus Jakarta Sans", "DM Sans", system-ui, sans-serif',
+            fontFamily: '"Poppins", "DM Sans", system-ui, sans-serif',
             textShadow: '0 1px 12px rgba(6,68,107,0.3)',
           }}>Dashboard Analitik</h1>
           <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', margin: '6px 0 0', fontWeight: 400 }}>
@@ -356,7 +356,7 @@ const Dashboard = () => {
 
   return (
     <div style={{
-      fontFamily: '"Plus Jakarta Sans", "DM Sans", system-ui, sans-serif',
+      fontFamily: '"Poppins", "DM Sans", system-ui, sans-serif',
       minHeight: '100vh',
       background: meshBg,
       padding: '2rem',
@@ -422,7 +422,7 @@ const Dashboard = () => {
 
       {/* Global font import */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
       `}</style>
     </div>
   );

@@ -13,10 +13,10 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
     .es-root {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       --col-navy: #06446B;
       --col-blue: #5790AB;
       --col-teal: #9CCDDB;
@@ -79,7 +79,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       flex-shrink: 0;
     }
     .es-stat-val {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 26px;
       font-weight: 700;
       line-height: 1;
@@ -148,7 +148,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       border: 1.5px solid var(--col-border-strong);
       border-radius: 12px;
       padding: 9px 12px 9px 38px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 13.5px;
       color: var(--col-navy);
       outline: none;
@@ -165,7 +165,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       border: 1.5px solid var(--col-border-strong);
       border-radius: 12px;
       padding: 9px 36px 9px 12px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 13.5px;
       color: var(--col-navy);
       outline: none;
@@ -189,7 +189,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       gap: 7px;
       padding: 8px 16px;
       border-radius: 11px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
@@ -223,7 +223,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
     }
     .es-table thead th {
       padding: 13px 20px;
-      font-family: 'Syne', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 10.5px;
       font-weight: 600;
       text-transform: uppercase;
@@ -246,7 +246,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       vertical-align: middle;
     }
     .es-nim {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-weight: 600;
       font-size: 12.5px;
       letter-spacing: 0.3px;
@@ -259,7 +259,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
     .es-center { text-align: center; }
     .es-right { text-align: right; }
     .es-ipk {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-weight: 700;
       font-size: 14px;
     }
@@ -372,7 +372,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       transition: all 0.18s;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
     }
     .es-page-btn:hover:not(:disabled) {
       background: var(--col-blue);
@@ -392,7 +392,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
 
     /* ─── Page header ─── */
     .es-page-title {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 26px;
       font-weight: 800;
       color: var(--col-navy);
@@ -411,7 +411,7 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       border: 1px solid rgba(87,144,171,0.25);
       border-radius: 6px;
       padding: 2px 10px;
-      font-family: 'Syne', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;

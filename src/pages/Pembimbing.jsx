@@ -129,12 +129,12 @@ const Pembimbing = () => {
   return (
     <div
       className="space-y-7 animate-in fade-in duration-500"
-      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+      style={{ fontFamily: "'Poppins', sans-serif" }}
     >
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2.5 text-2xl font-bold" style={{ color: '#06446B' }}>
+          <h1 className="flex items-center gap-2.5 text-2xl font-extrabold" style={{ color: '#06446B' }}>
             <Users size={24} style={{ color: '#5790AB' }} />
             Kelola Pembimbing
           </h1>
@@ -152,7 +152,7 @@ const Pembimbing = () => {
             border: 'none',
             padding: '9px 18px',
             borderRadius: '10px',
-            fontFamily: 'inherit',
+            fontFamily: 'poppins, sans-serif',
             fontSize: '13px',
             fontWeight: 700,
             cursor: 'pointer',

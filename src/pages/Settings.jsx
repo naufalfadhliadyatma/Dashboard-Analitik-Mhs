@@ -43,7 +43,7 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
       cursor: 'pointer',
       transition: 'all 0.22s cubic-bezier(.34,1.56,.64,1)',
       transform: active ? 'translateX(3px)' : 'translateX(0)',
-      fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+      fontFamily: "'Poppins', sans-serif",
     }}
     onMouseEnter={e => {
       if (!active) {
@@ -134,7 +134,7 @@ const InputField = ({ label, type = 'text', defaultValue, disabled, placeholder,
             WebkitBackdropFilter: 'blur(8px)',
             boxShadow: disabled ? 'none' : '0 2px 8px rgba(6,68,107,0.05)',
             transition: 'border 0.2s, box-shadow 0.2s',
-            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+            fontFamily: "'Poppins', system-ui, sans-serif",
             cursor: disabled ? 'not-allowed' : 'text',
           }}
           onFocus={e => {
@@ -229,7 +229,7 @@ const Settings = () => {
         background: T.navy,
         color: '#fff',
         borderRadius: '12px',
-        fontFamily: "'Plus Jakarta Sans', system-ui",
+        fontFamily: "'Poppins', system-ui",
         fontSize: '13.5px',
         fontWeight: 600,
         boxShadow: '0 8px 24px rgba(6,68,107,0.25)',
@@ -242,7 +242,7 @@ const Settings = () => {
     <>
       {/* Google Font loader */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;450;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
         @keyframes settingsFadeUp {
           from { opacity: 0; transform: translateY(16px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -257,7 +257,7 @@ const Settings = () => {
         minHeight: '100vh',
         background: T.pageBg,
         padding: '2rem 2.25rem 3rem',
-        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+        fontFamily: "'Poppins', system-ui, sans-serif",
       }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
 
@@ -377,7 +377,7 @@ const Settings = () => {
                             color: T.white, border: 'none',
                             boxShadow: '0 4px 14px rgba(6,68,107,0.28)',
                             transition: 'transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.18s ease',
-                            fontFamily: "'Plus Jakarta Sans', system-ui",
+                            fontFamily: "'Poppins', system-ui",
                           }}
                           onMouseEnter={e => {
                             e.currentTarget.style.transform = 'translateY(-2px)';
@@ -424,7 +424,7 @@ const Settings = () => {
                             color: T.white, border: 'none',
                             boxShadow: '0 4px 18px rgba(6,68,107,0.30)',
                             transition: 'transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease',
-                            fontFamily: "'Plus Jakarta Sans', system-ui",
+                            fontFamily: "'Poppins', system-ui",
                           }}
                           onMouseEnter={e => {
                             e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
@@ -477,7 +477,7 @@ const Settings = () => {
                           color: T.white, border: 'none',
                           boxShadow: '0 4px 18px rgba(6,68,107,0.30)',
                           transition: 'transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease',
-                          fontFamily: "'Plus Jakarta Sans', system-ui",
+                          fontFamily: "'Poppins', system-ui",
                         }}
                         onMouseEnter={e => {
                           e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
@@ -538,7 +538,7 @@ const Settings = () => {
                           color: T.white, border: 'none',
                           boxShadow: '0 4px 18px rgba(6,68,107,0.30)',
                           transition: 'transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease',
-                          fontFamily: "'Plus Jakarta Sans', system-ui",
+                          fontFamily: "'Poppins', system-ui",
                         }}
                         onMouseEnter={e => {
                           e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
