@@ -17,6 +17,10 @@ import Capstone from './pages/Capstone';
 import Pembimbing from './pages/Pembimbing';
 import MahasiswaDetail from './pages/MahasiswaDetail';
 import Settings from './pages/Settings';
+import Skripsi from './pages/Skripsi';
+import Kurikulum from './pages/Kurikulum';
+import Unauthorized from './pages/Unauthorized';
+import DosenSkripsi from './pages/DosenSkripsi';
 
 // ============ [MAIN APP] ============
 // [KOMPONEN] App - Root component yang mengatur seluruh routing
@@ -44,6 +48,10 @@ function App() {
               <Route path="/pembimbing" element={<Pembimbing />} />
               <Route path="/mahasiswa/:id" element={<MahasiswaDetail />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/skripsi" element={<Skripsi />} />
+              <Route path="/kurikulum" element={<Kurikulum />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              <Route path="/dosen-skripsi" element={<DosenSkripsi />} />
             </Route>
           </Route>
 

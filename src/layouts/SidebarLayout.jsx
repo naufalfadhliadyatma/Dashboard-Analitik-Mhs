@@ -6,11 +6,15 @@ import {
   Upload, 
   AlertTriangle, 
   GraduationCap, 
-  Users, 
+  // Users, 
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  BookOpen,
+  FileText,
+  UserCheck,
+  User
 } from 'lucide-react';
 
 // ============ [LAYOUT SECTION] ============
@@ -22,15 +26,18 @@ const SidebarLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, role: 'All' },
-    { name: 'Upload Data', path: '/upload', icon: Upload, role: 'Admin' },
-    { name: 'Evaluasi Studi', path: '/evaluasi-studi', icon: AlertTriangle, role: 'All' },
-    { name: 'Capstone', path: '/capstone', icon: GraduationCap, role: 'All' },
-    { name: 'Pembimbing', path: '/pembimbing', icon: Users, role: 'All' },
-    { name: 'Pengaturan', path: '/settings', icon: Settings, role: 'All' },
+    { name: 'Data Saya', path: '/mahasiswa/self', icon: User, roles: ['mahasiswa'] },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['admin', 'kaprodi'] },
+    { name: 'Upload KHS', path: '/upload', icon: Upload, roles: ['mahasiswa'] },
+    { name: 'Evaluasi Studi', path: '/evaluasi-studi', icon: AlertTriangle, roles: ['admin', 'kaprodi'] },
+    { name: 'Capstone', path: '/capstone', icon: GraduationCap, roles: ['admin', 'kaprodi'] },
+    { name: 'Skripsi', path: '/skripsi', icon: FileText, roles: ['admin', 'kaprodi'] },
+    { name: 'Dosen Skripsi', path: '/dosen-skripsi', icon: UserCheck, roles: ['admin', 'kaprodi'] },
+    { name: 'Kurikulum', path: '/kurikulum', icon: BookOpen, roles: ['admin'] },
+    { name: 'Pengaturan', path: '/settings', icon: Settings, roles: ['admin', 'kaprodi', 'mahasiswa'] },
   ];
 
-  const filteredNavItems = navItems.filter(item => item.role === 'All' || item.role === user?.role);
+  const filteredNavItems = navItems.filter(item => item.roles.includes(user?.role));
 
   const handleLogout = () => {
     logout();
@@ -56,7 +63,7 @@ const SidebarLayout = () => {
       `}>
         {/* Logo Area */}
         <div className="p-6 flex justify-center items-center border-b border-white/10">
-          <img src="src/assets/logo-uad.png" alt="Logo UAD" className="h-20 w-auto object-contain bg-white-0 p-0 rounded-lg" />
+          <img src="src/assets/logo-uad.png" alt="Logo UADD" className="h-20 w-auto object-contain bg-white-0 p-0 rounded-lg" />
         </div>
 
         {/* Navigation */}

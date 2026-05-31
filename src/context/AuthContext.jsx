@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import toast from 'react-hot-toast';
+import { usersData } from '../data/usersData';
 
 // ============ [AUTH CONTEXT] ============
 // [KOMPONEN] AuthContext - Mengelola state login dan data user simulasi
@@ -27,23 +28,20 @@ export const AuthProvider = ({ children }) => {
     // Simulasi loading
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Hardcode dummy validation
-    if (username === 'admin' && password === 'admin') {
-      const userData = { id: 1, role: 'Admin', name: 'Admin UAD' };
+    // [REVISI] Menggunakan data dummy dari usersData untuk mengecek role secara otomatis
+    const foundUser = usersData.find(u => u.username === username && u.password === password);
+
+    if (foundUser) {
+      // Hapus password sebelum disimpan ke state/localStorage
+      const { password, ...userData } = foundUser;
       setUser(userData);
       localStorage.setItem('uad_user', JSON.stringify(userData));
       toast.success('Login berhasil!');
-      return true;
-    } else if (username === 'kaprodi' && password === 'kaprodi') {
-      const userData = { id: 2, role: 'Kaprodi', name: 'Kaprodi Sistem Informasi' };
-      setUser(userData);
-      localStorage.setItem('uad_user', JSON.stringify(userData));
-      toast.success('Login berhasil!');
-      return true;
+      return userData; // Return userData to handle redirect in Login component
     }
 
     toast.error('Username atau password salah.');
-    return false;
+    return null;
   };
 
   const logout = () => {

@@ -449,16 +449,17 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
 const EvaluasiStudi = () => {
   const [searchTerm, setSearchTerm]     = useState('');
   const [filterStatus, setFilterStatus] = useState('Semua');
+  const [filterAngkatan, setFilterAngkatan] = useState('Semua Angkatan');
   const [, setMounted]           = useState(false);
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
 
-  /* ── Filter logic (unchanged) ── */
   const filteredData = dummyMahasiswa.filter((mhs) => {
     const matchSearch = mhs.nama.toLowerCase().includes(searchTerm.toLowerCase()) || mhs.nim.includes(searchTerm);
     const matchStatus = filterStatus === 'Semua' ? true : mhs.status === filterStatus;
-    return matchSearch && matchStatus;
+    const matchAngkatan = filterAngkatan === 'Semua Angkatan' ? true : mhs.angkatan === filterAngkatan;
+    return matchSearch && matchStatus && matchAngkatan;
   });
 
   const handleExport = (type) => {
@@ -601,6 +602,18 @@ const EvaluasiStudi = () => {
                 <option value="Berisiko">Berisiko</option>
                 <option value="Evaluasi">Evaluasi</option>
                 <option value="Lulus">Lulus</option>
+              </select>
+              <select
+                className="es-select"
+                value={filterAngkatan}
+                onChange={(e) => setFilterAngkatan(e.target.value)}
+              >
+                <option value="Semua Angkatan">Semua Angkatan</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
               </select>
             </div>
           </div>

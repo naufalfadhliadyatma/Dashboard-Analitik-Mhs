@@ -1,217 +1,226 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Mail, Phone, Calendar, UserCircle, BookOpen, CheckCircle, Clock, AlertCircle } from 'lucide-react';
-import { dummyMahasiswa } from '../data/dummy';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useStudentAnalytics } from '../hooks/useStudentAnalytics';
+import { User, BookOpen, GraduationCap, ArrowLeft, CheckCircle, Clock, AlertTriangle, Upload as UploadIcon, FileText } from 'lucide-react';
 
-// ============ [PAGE SECTION] ============
-// [KOMPONEN] MahasiswaDetail - Halaman detail mahasiswa menggunakan sistem Tabs
-
-// Data dummy tahapan capstone untuk demonstrasi
-const capstoneStages = [
-  { id: 1, label: 'Pengajuan Judul',       status: 'done',    date: 'Maret 2024'    },
-  { id: 2, label: 'Seminar Proposal',      status: 'done',    date: 'Mei 2024'      },
-  { id: 3, label: 'Penelitian & Bimbingan',status: 'active',  date: 'Sedang berjalan' },
-  { id: 4, label: 'Seminar Hasil',         status: 'pending', date: '-'             },
-  { id: 5, label: 'Sidang Munaqosyah',     status: 'pending', date: '-'             },
-];
-
-const StageIcon = ({ status }) => {
-  if (status === 'done')
-    return <CheckCircle size={20} className="text-green-500" />;
-  if (status === 'active')
-    return <Clock size={20} className="text-accent2 animate-pulse" />;
-  return <AlertCircle size={20} className="text-gray-300" />;
-};
+// ============ [PAGE: MAHASISWA DETAIL] ============
+// [KOMPONEN] MahasiswaDetail - Pusat informasi akademik mahasiswa komprehensif
 
 const MahasiswaDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profil');
+  
+  const analytics = useStudentAnalytics(id);
 
-  const mhs = dummyMahasiswa.find(m => m.nim === id) || dummyMahasiswa[0];
-  const progressSks = Math.min(Math.round((mhs.sks / 144) * 100), 100);
+  if (!analytics) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 animate-fade-in font-sans">
+        <AlertTriangle size={48} className="text-secondary mb-4" />
+        <h2 className="text-xl font-bold text-accent2">Data Mahasiswa Tidak Ditemukan</h2>
+        <button onClick={() => navigate(-1)} className="mt-4 btn-outline">Kembali</button>
+      </div>
+    );
+  }
 
-  const tabs = [
-    { key: 'profil',   label: 'Profil & Status'  },
-    { key: 'riwayat',  label: 'Riwayat Nilai'    },
-    { key: 'capstone', label: 'Status Akhir'      },
-  ];
+  const { student, currentSemester, ipk, totalSks, totalSksKurikulum, riwayatNilai, sksTidakLulusList, totalSksTidakLulus, belumDiambil, estimasiKelulusan, prediksiRisiko, riwayatKhs, capstone, skripsi } = analytics;
+
+  const isOwner = user?.role === 'mahasiswa' && user?.nim === id;
+
+  const getIpkColor = (val) => {
+    if (val >= 3.5) return 'text-green-600';
+    if (val >= 3.0) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getRisikoBadge = (risiko) => {
+    if (risiko === 'Tepat Waktu') return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">{risiko}</span>;
+    if (risiko === 'Berisiko Terlambat') return <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">{risiko}</span>;
+    return <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">{risiko}</span>;
+  };
+
+  const getStatusMahasiswaBadge = (status) => {
+    if (status === 'Aktif') return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">Aktif</span>;
+    if (status === 'Cuti') return <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold border border-yellow-200">Cuti</span>;
+    return <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">Non-Aktif</span>;
+  };
+
+  const sksPercentage = Math.min(100, Math.round((totalSks / totalSksKurikulum) * 100));
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    <div className="space-y-6 animate-fade-in font-sans pb-10">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-text-muted hover:text-accent2 transition-colors font-semibold text-sm">
+        <ArrowLeft size={16} /> Kembali
+      </button>
 
-        .mhs-detail-root,
-        .mhs-detail-root * {
-          font-family: 'Poppins', sans-serif !important;
-        }
-
-        .capstone-timeline {
-          position: relative;
-          padding-left: 36px;
-        }
-
-        .capstone-timeline::before {
-          content: '';
-          position: absolute;
-          left: 9px;
-          top: 4px;
-          bottom: 4px;
-          width: 2px;
-          background: linear-gradient(to bottom, #06446B 0%, #9CCDDB 60%, #e5e7eb 100%);
-          border-radius: 2px;
-        }
-
-        .capstone-stage {
-          position: relative;
-          padding: 12px 16px;
-          border-radius: 12px;
-          transition: background 0.2s;
-        }
-
-        .capstone-stage:hover {
-          background: rgba(0,0,0,0.025);
-        }
-
-        .capstone-stage-icon {
-          position: absolute;
-          left: -27px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: white;
-          border-radius: 50%;
-          padding: 1px;
-        }
-      `}</style>
-
-      <div className="mhs-detail-root max-w-5xl mx-auto space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-        {/* Back navigation */}
-        <Link
-          to="/evaluasi-studi"
-          className="inline-flex items-center text-sm font-medium text-text-muted hover:text-accent2 transition-colors"
-        >
-          <ArrowLeft size={16} className="mr-2" /> Kembali ke Daftar
-        </Link>
-
-        {/* ── Header Profile Card ── */}
-        <div className="card flex flex-col md:flex-row gap-6 items-start p-6">
-          <div className="w-28 h-28 rounded-xl bg-secondary/20 flex-shrink-0 overflow-hidden border-2 border-white shadow-md">
-            <img
-              src={`https://ui-avatars.com/api/?name=${mhs.nama}&background=06446B&color=fff&size=128`}
-              alt={`Foto ${mhs.nama}`}
-              className="w-full h-full object-cover"
-            />
+      {/* Profil Header */}
+      <div className="card p-6 flex flex-col md:flex-row gap-6 items-start md:items-center relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-accent1/20 to-secondary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div className="w-24 h-24 bg-gradient-to-br from-accent2 to-accent1 rounded-2xl flex items-center justify-center shadow-lg text-white font-bold text-3xl">
+          {student.nama.charAt(0)}
+        </div>
+        <div className="flex-1 z-10">
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-2xl font-extrabold text-accent2">{student.nama}</h1>
+            {getStatusMahasiswaBadge(student.status)}
           </div>
-
-          <div className="flex-1 w-full">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-3">
-              <div>
-                <h1 className="text-xl font-bold text-text-main leading-tight">{mhs.nama}</h1>
-                <p className="text-accent1 font-medium text-sm mt-0.5">{mhs.nim}</p>
-              </div>
-              <div className="px-4 py-2 bg-background rounded-xl border border-secondary/30 text-sm font-medium flex flex-col items-center min-w-[80px] shadow-sm">
-                <span className="text-xs text-text-muted font-medium">IPK</span>
-                <span className="text-xl font-bold text-accent2 leading-tight">{mhs.ipk.toFixed(2)}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-sm mt-4">
-              {[
-                { icon: <Calendar size={15} className="mr-2 text-accent1 flex-shrink-0" />, label: `Angkatan ${mhs.angkatan}` },
-                { icon: <UserCircle size={15} className="mr-2 text-accent1 flex-shrink-0" />, label: `Semester ${mhs.semester}` },
-                { icon: <Mail size={15} className="mr-2 text-accent1 flex-shrink-0" />, label: `${mhs.nim}@webmail.uad.ac.id` },
-                { icon: <Phone size={15} className="mr-2 text-accent1 flex-shrink-0" />, label: '0812-XXXX-XXXX' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center text-text-muted text-xs">
-                  {item.icon}
-                  <span className="truncate">{item.label}</span>
-                </div>
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-4 text-sm font-semibold text-text-muted">
+            <span className="flex items-center gap-1.5"><User size={16} className="text-accent1"/> NIM: {student.nim}</span>
+            <span className="flex items-center gap-1.5"><GraduationCap size={16} className="text-accent1"/> Angkatan {student.angkatan}</span>
+            <span className="flex items-center gap-1.5"><Clock size={16} className="text-accent1"/> Semester {currentSemester}</span>
           </div>
         </div>
+      </div>
 
-        {/* ── Tabs ── */}
-        <div className="card p-0 overflow-hidden">
-          {/* Tab bar */}
-          <div className="flex border-b border-secondary/20 bg-background/50">
-            {tabs.map(tab => (
-              <button
-                key={tab.key}
-                className={`px-6 py-3.5 text-sm font-medium transition-colors border-b-2 ${
-                  activeTab === tab.key
-                    ? 'border-accent2 text-accent2 bg-white'
-                    : 'border-transparent text-text-muted hover:text-text-main hover:bg-white/50'
-                }`}
-                onClick={() => setActiveTab(tab.key)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+      {/* Navigation Tabs */}
+      <div className="flex gap-2 border-b border-secondary/30 overflow-x-auto no-scrollbar">
+        {['profil', 'riwayat nilai', 'status akhir', 'riwayat upload khs'].map(tab => (
+          <button 
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`whitespace-nowrap px-4 py-3 font-bold text-sm transition-all border-b-2 ${activeTab === tab ? 'border-accent2 text-accent2 bg-secondary/5' : 'border-transparent text-text-muted hover:text-accent1'}`}
+          >
+            {tab.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+          </button>
+        ))}
+      </div>
 
-          <div className="p-6">
-
-            {/* ── TAB: Profil & Status ── */}
-            {activeTab === 'profil' && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div>
-                  <h3 className="font-semibold text-base text-text-main mb-3">Progress SKS Keseluruhan</h3>
-                  <div className="flex justify-between text-xs font-medium mb-1.5">
-                    <span>{mhs.sks} SKS Lulus</span>
-                    <span className="text-text-muted">Target: 144 SKS</span>
-                  </div>
-                  <div className="w-full bg-background rounded-full h-2.5">
-                    <div
-                      className="bg-accent1 h-2.5 rounded-full transition-all duration-1000 ease-out"
-                      style={{ width: `${progressSks}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-right text-text-muted mt-1">{progressSks}% Selesai</p>
+      {/* Tab Content */}
+      <div className="pt-2">
+        
+        {/* TAB: PROFIL */}
+        {activeTab === 'profil' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="card p-5 bg-gradient-to-br from-white to-gray-50 border-secondary/20">
+                  <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">IPK Saat Ini</p>
+                  <p className={`text-4xl font-extrabold ${getIpkColor(ipk)}`}>{ipk.toFixed(2)}</p>
                 </div>
+                <div className="card p-5 bg-gradient-to-br from-white to-gray-50 border-secondary/20">
+                  <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Total SKS</p>
+                  <p className="text-4xl font-extrabold text-accent2">{totalSks} <span className="text-sm text-text-muted font-medium">/ {totalSksKurikulum}</span></p>
+                </div>
+                <div className="card p-5 bg-gradient-to-br from-white to-gray-50 border-secondary/20">
+                  <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Mata Kuliah Lulus</p>
+                  <p className="text-4xl font-extrabold text-accent1">{riwayatNilai.length}</p>
+                </div>
+                <div className="card p-5 bg-gradient-to-br from-white to-gray-50 border-secondary/20">
+                  <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Estimasi Lulus</p>
+                  <p className="text-lg font-extrabold text-accent2 mt-1">{estimasiKelulusan}</p>
+                </div>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 border border-secondary/20 rounded-xl bg-gray-50">
-                    <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mb-1">
-                      Status Akademik Saat Ini
-                    </span>
-                    <p className="text-base font-bold text-text-main">{mhs.status}</p>
+              {/* Evaluasi Akademik Section */}
+              <div className="card p-6 border-l-4 border-l-accent1">
+                <h3 className="text-lg font-bold text-accent2 mb-4 flex items-center gap-2">
+                  <AlertTriangle size={20} className="text-accent1" /> Evaluasi Akademik
+                </h3>
+                <div className="space-y-5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-text-muted">Prediksi Risiko Studi</span>
+                    {getRisikoBadge(prediksiRisiko)}
                   </div>
-                  <div className="p-4 border border-secondary/20 rounded-xl bg-gray-50">
-                    <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mb-1">
-                      Dosen Pembimbing
-                    </span>
-                    <p className="text-base font-bold text-text-main">Dr. Fathur Rahman, M.Kom.</p>
+                  <div>
+                    <div className="flex justify-between text-xs font-bold text-accent2 mb-1">
+                      <span>Progres Akademik Keseluruhan</span>
+                      <span>{sksPercentage}%</span>
+                    </div>
+                    <div className="w-full bg-secondary/20 rounded-full h-2.5">
+                      <div className="bg-accent1 h-2.5 rounded-full transition-all duration-1000" style={{ width: `${sksPercentage}%` }}></div>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-lg">
+                    <p className="text-xs font-bold text-yellow-800 mb-1">Catatan Evaluasi Semester Terakhir:</p>
+                    <p className="text-sm text-yellow-700">Mahasiswa menunjukkan progres yang stabil. Perlu meningkatkan partisipasi pada mata kuliah pilihan di semester berikutnya untuk mempercepat penyelesaian SKS.</p>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+            
+            <div className="space-y-6">
+              <div className="card p-6 bg-accent2 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4"></div>
+                <h3 className="text-lg font-bold mb-4 relative z-10">Info Tambahan</h3>
+                <ul className="space-y-4 relative z-10 text-sm">
+                  <li className="flex flex-col gap-1 border-b border-white/10 pb-3">
+                    <span className="text-white/60 text-xs font-semibold uppercase tracking-wider">Status Dosen Wali</span>
+                    <span className="font-bold">Telah disetujui KRS</span>
+                  </li>
+                  <li className="flex flex-col gap-1 border-b border-white/10 pb-3">
+                    <span className="text-white/60 text-xs font-semibold uppercase tracking-wider">Poin Keaktifan</span>
+                    <span className="font-bold">120 Poin (Cukup)</span>
+                  </li>
+                  <li className="flex flex-col gap-1">
+                    <span className="text-white/60 text-xs font-semibold uppercase tracking-wider">Status Keuangan</span>
+                    <span className="font-bold text-green-300">Lunas Semester Ini</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
 
-            {/* ── TAB: Riwayat Nilai ── */}
-            {activeTab === 'riwayat' && (
-              <div className="animate-in fade-in duration-300">
-                <div className="overflow-x-auto border border-secondary/20 rounded-xl">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-background text-text-muted uppercase text-xs">
-                      <tr>
-                        <th className="px-4 py-3 font-semibold">Semester</th>
-                        <th className="px-4 py-3 font-semibold">Mata Kuliah</th>
-                        <th className="px-4 py-3 font-semibold text-center">SKS</th>
-                        <th className="px-4 py-3 font-semibold text-center">Nilai</th>
+        {/* TAB: RIWAYAT NILAI */}
+        {activeTab === 'riwayat nilai' && (
+          <div className="space-y-6">
+            <div className="card p-6">
+              <h3 className="text-lg font-bold text-accent2 mb-4">Mata Kuliah Yang Sudah Diambil</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-secondary/10 text-accent2 text-sm border-b border-secondary/20">
+                      <th className="p-3 font-semibold rounded-tl-lg">Kode MK</th>
+                      <th className="p-3 font-semibold">Nama Mata Kuliah</th>
+                      <th className="p-3 font-semibold text-center">Semester</th>
+                      <th className="p-3 font-semibold text-center">SKS</th>
+                      <th className="p-3 font-semibold text-center">Nilai</th>
+                      <th className="p-3 font-semibold text-center rounded-tr-lg">Bobot</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {riwayatNilai.map((item, idx) => (
+                      <tr key={idx} className="border-b border-secondary/10 hover:bg-secondary/5 text-sm">
+                        <td className="p-3 font-medium text-accent2">{item.kode}</td>
+                        <td className="p-3 font-semibold text-text-main">{item.nama}</td>
+                        <td className="p-3 text-center">{item.semester}</td>
+                        <td className="p-3 text-center">{item.sks}</td>
+                        <td className="p-3 text-center font-bold text-accent1">{item.nilai}</td>
+                        <td className="p-3 text-center text-text-muted">{item.bobot}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {sksTidakLulusList.length > 0 && (
+              <div className="card p-6 border-l-4 border-l-red-500">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-red-600">SKS Tidak Lulus</h3>
+                  <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">Total: {totalSksTidakLulus} SKS</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-red-50 text-red-700 text-sm border-b border-red-100">
+                        <th className="p-3 font-semibold">Kode MK</th>
+                        <th className="p-3 font-semibold">Nama Mata Kuliah</th>
+                        <th className="p-3 font-semibold text-center">Semester</th>
+                        <th className="p-3 font-semibold text-center">SKS</th>
+                        <th className="p-3 font-semibold text-center">Nilai</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-secondary/20">
-                      {[
-                        { sem: 'Gasal 2023',  mk: 'Metode Penelitian',       sks: 3, nilai: 'A', color: 'text-green-600'  },
-                        { sem: 'Genap 2023',  mk: 'Kecerdasan Buatan',       sks: 3, nilai: 'B', color: 'text-yellow-600' },
-                        { sem: 'Genap 2023',  mk: 'Pemrograman Web Lanjut',  sks: 3, nilai: 'D', color: 'text-red-600'    },
-                      ].map((row, i) => (
-                        <tr key={i} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-3 text-text-muted">{row.sem}</td>
-                          <td className="px-4 py-3 text-text-main font-medium">{row.mk}</td>
-                          <td className="px-4 py-3 text-center text-text-muted">{row.sks}</td>
-                          <td className={`px-4 py-3 text-center font-bold ${row.color}`}>{row.nilai}</td>
+                    <tbody>
+                      {sksTidakLulusList.map((item, idx) => (
+                        <tr key={idx} className="border-b border-red-50 hover:bg-red-50/50 text-sm">
+                          <td className="p-3 font-medium text-red-800">{item.kode}</td>
+                          <td className="p-3 font-semibold text-red-900">{item.nama}</td>
+                          <td className="p-3 text-center text-red-700">{item.semester}</td>
+                          <td className="p-3 text-center text-red-700">{item.sks}</td>
+                          <td className="p-3 text-center font-bold text-red-600">{item.nilai}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -220,78 +229,134 @@ const MahasiswaDetail = () => {
               </div>
             )}
 
-            {/* ── TAB: Status Akhir ── */}
-            {activeTab === 'capstone' && (
-              <div className="animate-in fade-in duration-300 space-y-6">
-                {/* Summary card */}
-                <div className="p-5 border border-secondary/20 rounded-xl flex items-center justify-between bg-blue-50/30">
-                  <div>
-                    <p className="text-xs text-text-muted mb-1 font-medium uppercase tracking-wider">Tahap Saat Ini</p>
-                    <p className="text-lg font-bold text-accent2">{mhs.statusCapstone}</p>
-                  </div>
-                  <div className="w-12 h-12 rounded-full bg-accent1/20 flex items-center justify-center">
-                    <BookOpen className="text-accent2" size={22} />
-                  </div>
-                </div>
-
-                {/* Timeline */}
-                <div>
-                  <h3 className="font-semibold text-base text-text-main mb-4">Alur Tahapan Tugas Akhir</h3>
-                  <div className="capstone-timeline space-y-1">
-                    {capstoneStages.map((stage) => (
-                      <div key={stage.id} className="capstone-stage">
-                        <span className="capstone-stage-icon">
-                          <StageIcon status={stage.status} />
-                        </span>
-                        <div className="flex items-center justify-between">
-                          <p className={`text-sm font-semibold ${
-                            stage.status === 'done'    ? 'text-text-main'   :
-                            stage.status === 'active'  ? 'text-accent2'     :
-                            'text-gray-400'
-                          }`}>
-                            {stage.label}
-                          </p>
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                            stage.status === 'done'   ? 'bg-green-100 text-green-600'    :
-                            stage.status === 'active' ? 'bg-blue-100 text-accent2'       :
-                            'bg-gray-100 text-gray-400'
-                          }`}>
-                            {stage.status === 'done' ? 'Selesai' : stage.status === 'active' ? 'Aktif' : 'Belum'}
-                          </span>
-                        </div>
-                        <p className="text-xs text-text-muted mt-0.5">{stage.date}</p>
-                      </div>
+            <div className="card p-6">
+              <h3 className="text-lg font-bold text-accent2 mb-4">Mata Kuliah Wajib Belum Diambil</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-secondary/10 text-accent2 text-sm border-b border-secondary/20">
+                      <th className="p-3 font-semibold rounded-tl-lg">Kode MK</th>
+                      <th className="p-3 font-semibold">Nama Mata Kuliah</th>
+                      <th className="p-3 font-semibold text-center">SKS</th>
+                      <th className="p-3 font-semibold text-center rounded-tr-lg">Semester Ideal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {belumDiambil.slice(0, 5).map((item, idx) => (
+                      <tr key={idx} className="border-b border-secondary/10 hover:bg-secondary/5 text-sm opacity-70">
+                        <td className="p-3 font-medium text-accent2">{item.kode}</td>
+                        <td className="p-3 text-text-main">{item.nama}</td>
+                        <td className="p-3 text-center">{item.sks}</td>
+                        <td className="p-3 text-center font-semibold text-accent1">{item.semester}</td>
+                      </tr>
                     ))}
-                  </div>
-                </div>
-
-                {/* Dosen Pembimbing TA */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                  <div className="p-4 border border-secondary/20 rounded-xl bg-gray-50">
-                    <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mb-1">
-                      Pembimbing I
-                    </span>
-                    <p className="text-sm font-bold text-text-main">Dr. Fathur Rahman, M.Kom.</p>
-                  </div>
-                  <div className="p-4 border border-secondary/20 rounded-xl bg-gray-50">
-                    <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mb-1">
-                      Pembimbing II
-                    </span>
-                    <p className="text-sm font-bold text-text-main">Siti Nurhaliza, S.T., M.T.</p>
-                  </div>
-                </div>
-
-                <p className="text-xs text-text-muted border-t border-secondary/20 pt-4">
-                  {/* [BACKEND] GET /api/mahasiswa/:id/capstone — Ambil log historis tahapan capstone jika diperlukan nanti. */}
-                  Data tahapan bersifat demonstrasi. Hubungkan ke endpoint backend untuk data real-time.
-                </p>
+                    {belumDiambil.length > 5 && (
+                      <tr>
+                        <td colSpan="4" className="p-3 text-center text-xs font-semibold text-text-muted">Dan {belumDiambil.length - 5} mata kuliah wajib lainnya...</td>
+                      </tr>
+                    )}
+                    {belumDiambil.length === 0 && (
+                      <tr>
+                        <td colSpan="4" className="p-6 text-center text-text-muted">Semua mata kuliah wajib telah diambil.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            )}
-
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* TAB: STATUS AKHIR */}
+        {activeTab === 'status akhir' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="card p-6">
+              <h3 className="text-lg font-bold text-accent2 mb-6 flex items-center gap-2 border-b border-secondary/20 pb-4">
+                <BookOpen size={20} className="text-accent1" /> Status Capstone
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Judul Capstone</p>
+                  <p className="font-semibold text-accent2">{capstone.judul || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Status Saat Ini</p>
+                  <span className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-xs font-bold border border-blue-200 inline-block">{capstone.status}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="card p-6">
+              <h3 className="text-lg font-bold text-accent2 mb-6 flex items-center gap-2 border-b border-secondary/20 pb-4">
+                <FileText size={20} className="text-accent1" /> Status Skripsi
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Judul Skripsi</p>
+                  <p className="font-semibold text-accent2">{skripsi.judul || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Dosen Pembimbing</p>
+                  <p className="font-semibold text-text-main">{skripsi.dosenPembimbing || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Status Saat Ini</p>
+                  <span className="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-bold border border-indigo-200 inline-block">{skripsi.status}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: RIWAYAT KHS */}
+        {activeTab === 'riwayat upload khs' && (
+          <div className="card p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold text-accent2">Riwayat Upload KHS</h3>
+              {isOwner && (
+                <button onClick={() => navigate('/upload')} className="btn-primary text-xs flex items-center gap-2">
+                  <UploadIcon size={14} /> Upload KHS Baru
+                </button>
+              )}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-secondary/10 text-accent2 text-sm border-b border-secondary/20">
+                    <th className="p-3 font-semibold rounded-tl-lg">Semester</th>
+                    <th className="p-3 font-semibold">Tahun Akademik</th>
+                    <th className="p-3 font-semibold">Tanggal Upload</th>
+                    <th className="p-3 font-semibold">Nama File</th>
+                    <th className="p-3 font-semibold rounded-tr-lg">Status Verifikasi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {riwayatKhs.map(item => (
+                    <tr key={item.id} className="border-b border-secondary/10 hover:bg-secondary/5 text-sm">
+                      <td className="p-3 font-medium text-accent2">{item.semester}</td>
+                      <td className="p-3">{item.tahunAkademik}</td>
+                      <td className="p-3">{new Date(item.tanggalUpload).toLocaleDateString('id-ID')}</td>
+                      <td className="p-3 text-accent1 font-medium">{item.namaFile}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-md text-xs font-bold ${
+                          item.status === 'Terverifikasi' ? 'bg-green-100 text-green-700' :
+                          item.status === 'Ditolak' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                        }`}>{item.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                  {riwayatKhs.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="p-6 text-center text-text-muted">Belum ada riwayat upload KHS.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

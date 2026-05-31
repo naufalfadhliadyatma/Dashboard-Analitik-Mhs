@@ -25,11 +25,15 @@ const Login = () => {
     }
 
     setIsLoading(true);
-    const success = await login(username, password);
+    const userData = await login(username, password);
     setIsLoading(false);
 
-    if (success) {
-      navigate('/dashboard');
+    if (userData) {
+      if (userData.role === 'mahasiswa') {
+        navigate(`/mahasiswa/${userData.nim}`);
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
@@ -400,7 +404,7 @@ const Login = () => {
 
         {/* Footer */}
         <div className="text-center glass-footer">
-          <p>Gunakan kredensial <span style={{ color: 'rgba(255,255,255,0.70)', fontWeight: 500 }}>admin/admin</span> atau <span style={{ color: 'rgba(255,255,255,0.70)', fontWeight: 500 }}>kaprodi/kaprodi</span> untuk simulasi.</p>
+          <p>Gunakan kredensial <span style={{ color: 'rgba(255,255,255,0.70)', fontWeight: 500 }}>admin/admin123</span>, <span style={{ color: 'rgba(255,255,255,0.70)', fontWeight: 500 }}>kaprodi/kaprodi123</span>, atau NIM <span style={{ color: 'rgba(255,255,255,0.70)', fontWeight: 500 }}>2200018001/mahasiswa123</span> untuk simulasi.</p>
         </div>
       </div>
     </>

@@ -1,196 +1,203 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { dummyUploadHistory } from '../data/uploadHistoryData';
+import { Upload as UploadIcon, FileText, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { UploadCloud, File, X, CheckCircle2, AlertTriangle } from 'lucide-react';
 
-// ============ [PAGE SECTION] ============
-// [KOMPONEN] Upload - Halaman khusus Admin untuk mengunggah data mahasiswa berformat CSV
+// ============ [PAGE: UPLOAD KHS] ============
+// [KOMPONEN] Upload - Halaman bagi Mahasiswa untuk mengunggah file KHS PDF
+
+// [BACKEND] POST /api/khs/upload - Menerima file PDF KHS dari mahasiswa, disertai semester dan tahun akademik
+// [BACKEND] GET /api/khs/history/:nim - Mengambil riwayat upload KHS milik mahasiswa berdasarkan NIM
 
 const Upload = () => {
+  const { user } = useAuth();
   const [file, setFile] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [semester, setSemester] = useState('');
+  const [tahunAkademik, setTahunAkademik] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const fileInputRef = useRef(null);
+  
+  // Ambil history untuk user ini
+  const [history, setHistory] = useState(dummyUploadHistory.filter(h => h.nim === user?.nim));
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type === 'text/csv' || droppedFile.name.endsWith('.csv')) {
-        setFile(droppedFile);
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      if (selectedFile.type !== 'application/pdf') {
+        toast.error('Hanya file PDF yang diperbolehkan');
+        setFile(null);
+        e.target.value = null;
       } else {
-        toast.error('Hanya file CSV yang diperbolehkan');
+        setFile(selectedFile);
       }
     }
   };
 
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const clearFile = () => {
-    setFile(null);
-    setProgress(0);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
   const handleUpload = async () => {
-    if (!file) return;
-
-    setUploading(true);
+    if (!file || !semester || !tahunAkademik) return;
+    
+    setIsUploading(true);
     setProgress(0);
-
-    // Simulasi progress bar upload
+    
+    // Simulate progress
     const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
+      setProgress(p => {
+        if (p >= 90) {
           clearInterval(interval);
-          return 100;
+          return 90;
         }
-        return prev + 10;
+        return p + 10;
       });
     }, 200);
 
-    // [BACKEND] POST /api/mahasiswa/upload - Kirim file CSV ke server
-    // Endpoint ini akan menerima multipart/form-data
-    await new Promise((resolve) => setTimeout(resolve, 2500));
-    
-    clearInterval(interval);
-    setProgress(100);
-    setUploading(false);
-    toast.success('Data CSV berhasil diunggah dan diproses!');
-    
-    // Reset after success
+    // Simulate upload delay
     setTimeout(() => {
-      clearFile();
+      clearInterval(interval);
+      setProgress(100);
+      
+      const newEntry = {
+        id: `U${Date.now()}`,
+        nim: user?.nim,
+        semester,
+        tahunAkademik,
+        tanggalUpload: new Date().toISOString(),
+        namaFile: file.name,
+        status: 'Diproses'
+      };
+      
+      setHistory([newEntry, ...history]);
+      toast.success('KHS berhasil diunggah!');
+      
+      // Reset form
+      setTimeout(() => {
+        setIsUploading(false);
+        setProgress(0);
+        setFile(null);
+        setSemester('');
+        setTahunAkademik('');
+      }, 500);
     }, 2000);
   };
 
+  const getStatusBadge = (status) => {
+    if (status === 'Terverifikasi') return <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded flex items-center gap-1"><CheckCircle size={12} /> {status}</span>;
+    if (status === 'Ditolak') return <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded flex items-center gap-1"><AlertCircle size={12} /> {status}</span>;
+    return <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded flex items-center gap-1"><Clock size={12} /> {status}</span>;
+  };
+
   return (
-    <>
-      {/* Blok Style untuk memuat dan mengaktifkan Font Poppins */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    <div className="space-y-6 animate-fade-in font-sans">
+      <div>
+        <h1 className="text-2xl font-extrabold text-accent2 flex items-center gap-2">
+          <UploadIcon size={24} className="text-accent1" />
+          Upload Kartu Hasil Studi (KHS)
+        </h1>
+        <p className="text-sm text-text-muted mt-1">Mahasiswa wajib mengupload KHS setiap akhir semester agar data akademik diperbarui.</p>
+      </div>
 
-        .font-poppins {
-          font-family: 'Poppins', sans-serif !important;
-        }
-      `}</style>
-
-      {/* Menambahkan class font-poppins pada div utama */}
-      <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-500 font-poppins">
-        <div>
-          <h1 className="text-2xl font-extrabold text-accent2">Unggah Data Mahasiswa</h1>
-          <p className="text-text-muted text-sm mt-1">Impor data terbaru dalam format CSV untuk memperbarui dashboard analitik.</p>
+      <div className="card p-6 max-w-2xl">
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-semibold text-text-muted mb-2">Semester</label>
+            <select value={semester} onChange={(e) => setSemester(e.target.value)} className="input-field" disabled={isUploading}>
+              <option value="">Pilih Semester...</option>
+              {[1,2,3,4,5,6,7,8].map(s => <option key={s} value={s}>Semester {s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-text-muted mb-2">Tahun Akademik</label>
+            <select value={tahunAkademik} onChange={(e) => setTahunAkademik(e.target.value)} className="input-field" disabled={isUploading}>
+              <option value="">Pilih Tahun Akademik...</option>
+              <option value="2022/2023 Ganjil">2022/2023 Ganjil</option>
+              <option value="2022/2023 Genap">2022/2023 Genap</option>
+              <option value="2023/2024 Ganjil">2023/2024 Ganjil</option>
+              <option value="2023/2024 Genap">2023/2024 Genap</option>
+              <option value="2024/2025 Ganjil">2024/2025 Ganjil</option>
+            </select>
+          </div>
         </div>
 
-        <div className="card">
-          {/* Drag and Drop Area */}
-          <div 
-            className={`border-2 border-dashed rounded-xl p-10 text-center transition-all duration-200 ${
-              isDragging ? 'border-accent1 bg-accent1/5' : 'border-secondary/50 hover:border-accent1/50 bg-background/50'
-            }`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => !file && fileInputRef.current?.click()}
-          >
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-text-muted mb-2">File KHS (PDF)</label>
+          <div className="border-2 border-dashed border-secondary/40 rounded-xl p-8 text-center hover:bg-secondary/5 transition-colors relative">
             <input 
               type="file" 
-              ref={fileInputRef} 
+              accept="application/pdf" 
               onChange={handleFileChange} 
-              accept=".csv" 
-              className="hidden" 
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              disabled={isUploading}
             />
-            
-            {!file ? (
-              <div className="flex flex-col items-center cursor-pointer">
-                <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 text-accent1">
-                  <UploadCloud size={32} />
-                </div>
-                <h3 className="text-lg font-medium text-text-main mb-1">Tarik dan lepas file CSV di sini</h3>
-                <p className="text-sm text-text-muted mb-6">atau klik untuk memilih file dari komputer Anda</p>
-                <button className="btn-secondary" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>
-                  Pilih File
-                </button>
+            {file ? (
+              <div className="flex flex-col items-center">
+                <FileText size={48} className="text-accent1 mb-3" />
+                <p className="font-semibold text-accent2">{file.name}</p>
+                <p className="text-xs text-text-muted">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
               </div>
             ) : (
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4 text-green-600">
-                  <File size={32} />
-                </div>
-                <h3 className="text-lg font-medium text-text-main mb-1">{file.name}</h3>
-                <p className="text-sm text-text-muted mb-4">{(file.size / 1024).toFixed(2)} KB</p>
-                
-                {!uploading && progress === 0 && (
-                  <button 
-                    className="text-sm text-red-500 hover:text-red-700 flex items-center transition-colors"
-                    onClick={(e) => { e.stopPropagation(); clearFile(); }}
-                  >
-                    <X size={16} className="mr-1" /> Hapus File
-                  </button>
-                )}
-
-                {/* Progress Bar */}
-                {(uploading || progress > 0) && (
-                  <div className="w-full max-w-md mt-6">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="font-medium text-text-main">{progress === 100 ? 'Selesai' : 'Mengunggah...'}</span>
-                      <span className="text-text-muted">{progress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                      <div 
-                        className="bg-accent1 h-2.5 rounded-full transition-all duration-300 ease-out" 
-                        style={{ width: `${progress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
+              <div className="flex flex-col items-center text-text-muted">
+                <UploadIcon size={48} className="text-secondary mb-3" />
+                <p className="font-medium text-accent2">Klik atau seret file PDF ke sini</p>
+                <p className="text-xs">Maksimal 5MB. Hanya format .pdf yang diterima.</p>
               </div>
             )}
           </div>
-
-          {/* Action Button */}
-          <div className="mt-6 flex justify-end">
-            <button 
-              className="btn-primary flex items-center"
-              disabled={!file || uploading || progress === 100}
-              onClick={handleUpload}
-            >
-              {progress === 100 ? (
-                <><CheckCircle2 size={18} className="mr-2" /> Berhasil</>
-              ) : uploading ? (
-                <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span> Memproses...</>
-              ) : (
-                <><UploadCloud size={18} className="mr-2" /> Upload & Proses</>
-              )}
-            </button>
-          </div>
         </div>
-        
-        {/* Instructions */}
-        <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-start">
-          <AlertTriangle size={20} className="text-blue-500 mt-0.5 mr-3 flex-shrink-0" />
-          <div className="text-sm text-blue-800">
-            <p className="font-semibold mb-1">Format File CSV yang Didukung:</p>
-            <p>Pastikan file CSV memiliki kolom: NIM, Nama, Angkatan, IPK, Semester, SKS, Status Akademik, dan Status Capstone. Pemisah antar kolom (delimiter) harus menggunakan koma (,).</p>
+
+        {isUploading && (
+          <div className="mb-6">
+            <div className="flex justify-between text-xs mb-1 font-semibold text-accent2">
+              <span>Mengunggah...</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="w-full bg-secondary/20 rounded-full h-2">
+              <div className="bg-accent1 h-2 rounded-full transition-all duration-200" style={{ width: `${progress}%` }}></div>
+            </div>
           </div>
+        )}
+
+        <button 
+          onClick={handleUpload} 
+          disabled={!file || !semester || !tahunAkademik || isUploading}
+          className="btn-primary w-full disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+        >
+          {isUploading ? 'Memproses...' : 'Upload KHS'}
+        </button>
+      </div>
+
+      <div className="card p-6">
+        <h2 className="text-lg font-bold text-accent2 mb-4">Riwayat Upload</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-secondary/10 text-accent2 text-sm">
+                <th className="p-3 font-semibold rounded-tl-lg">Semester</th>
+                <th className="p-3 font-semibold">Tahun Akademik</th>
+                <th className="p-3 font-semibold">Tanggal Upload</th>
+                <th className="p-3 font-semibold">Nama File</th>
+                <th className="p-3 font-semibold rounded-tr-lg">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map(item => (
+                <tr key={item.id} className="border-b border-secondary/10 hover:bg-secondary/5 transition-colors text-sm">
+                  <td className="p-3 font-medium text-accent2">{item.semester}</td>
+                  <td className="p-3">{item.tahunAkademik}</td>
+                  <td className="p-3">{new Date(item.tanggalUpload).toLocaleDateString('id-ID')}</td>
+                  <td className="p-3 flex items-center gap-2 text-accent1"><FileText size={16}/> {item.namaFile}</td>
+                  <td className="p-3">{getStatusBadge(item.status)}</td>
+                </tr>
+              ))}
+              {history.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="p-6 text-center text-text-muted">Belum ada riwayat upload.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

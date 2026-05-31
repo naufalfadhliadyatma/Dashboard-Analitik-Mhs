@@ -1,24 +1,29 @@
 import { useState } from 'react';
-import { Search, GraduationCap } from 'lucide-react';
-import { dummyCapstone } from '../data/capstoneData';
+import { Search, Filter, FileText, CheckCircle2, Clock, ChevronRight } from 'lucide-react';
+import { dummySkripsi } from '../data/skripsiData';
 import { Link } from 'react-router-dom';
 
-// ============ [PAGE: CAPSTONE] ============
-// [KOMPONEN] Capstone - Halaman pemantauan progres Capstone eksklusif
+// ============ [PAGE: SKRIPSI] ============
+// [KOMPONEN] Skripsi - Halaman pemantauan progres Skripsi eksklusif
+// [BACKEND] GET /api/skripsi - Mengambil semua data monitoring skripsi mahasiswa
+// [BACKEND] PUT /api/skripsi/:nim - Memperbarui status skripsi mahasiswa
 
 const STATUS_CONFIG = {
   'Belum Mulai': { bg: 'bg-gray-100', text: 'text-gray-600', dot: 'bg-gray-400' },
-  'Sedang Berjalan': { bg: 'bg-blue-100', text: 'text-blue-700', dot: 'bg-blue-500' },
-  'Revisi': { bg: 'bg-yellow-100', text: 'text-yellow-700', dot: 'bg-yellow-500' },
+  'Proposal Diajukan': { bg: 'bg-blue-100', text: 'text-blue-700', dot: 'bg-blue-500' },
+  'Seminar Proposal': { bg: 'bg-indigo-100', text: 'text-indigo-700', dot: 'bg-indigo-500' },
+  'Penelitian': { bg: 'bg-yellow-100', text: 'text-yellow-700', dot: 'bg-yellow-500' },
+  'Seminar Hasil': { bg: 'bg-orange-100', text: 'text-orange-700', dot: 'bg-orange-500' },
+  'Sidang Skripsi': { bg: 'bg-purple-100', text: 'text-purple-700', dot: 'bg-purple-500' },
   'Selesai': { bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
 };
 
-const Capstone = () => {
+const Skripsi = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('Semua Status');
   const [filterAngkatan, setFilterAngkatan] = useState('Semua Angkatan');
 
-  const filteredData = dummyCapstone.filter((mhs) => {
+  const filteredData = dummySkripsi.filter((mhs) => {
     const matchSearch = mhs.nama.toLowerCase().includes(searchTerm.toLowerCase()) || mhs.nim.includes(searchTerm);
     const matchStatus = filterStatus === 'Semua Status' || mhs.status === filterStatus;
     const matchAngkatan = filterAngkatan === 'Semua Angkatan' || mhs.angkatan === filterAngkatan;
@@ -29,10 +34,10 @@ const Capstone = () => {
     <div className="space-y-6 animate-fade-in font-sans">
       <div>
         <h1 className="text-2xl font-extrabold text-accent2 flex items-center gap-2">
-          <GraduationCap size={24} className="text-accent1" />
-          Monitoring Capstone
+          <FileText size={24} className="text-accent1" />
+          Monitoring Skripsi
         </h1>
-        <p className="text-sm text-text-muted mt-1">Pemantauan progres penyelesaian Capstone mahasiswa secara eksklusif</p>
+        <p className="text-sm text-text-muted mt-1">Pemantauan progres penyelesaian skripsi mahasiswa secara eksklusif</p>
       </div>
 
       <div className="card p-6">
@@ -64,7 +69,8 @@ const Capstone = () => {
                 <th className="p-3 font-semibold">NIM</th>
                 <th className="p-3 font-semibold">Nama Mahasiswa</th>
                 <th className="p-3 font-semibold">Angkatan</th>
-                <th className="p-3 font-semibold">Judul Capstone</th>
+                <th className="p-3 font-semibold">Judul Skripsi</th>
+                <th className="p-3 font-semibold">Dosen Pembimbing</th>
                 <th className="p-3 font-semibold">Status</th>
                 <th className="p-3 font-semibold">Update Terakhir</th>
               </tr>
@@ -76,6 +82,7 @@ const Capstone = () => {
                   <td className="p-3 font-semibold">{item.nama}</td>
                   <td className="p-3">{item.angkatan}</td>
                   <td className="p-3 text-text-muted truncate max-w-xs">{item.judul}</td>
+                  <td className="p-3">{item.dosenPembimbing}</td>
                   <td className="p-3">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-max ${STATUS_CONFIG[item.status].bg} ${STATUS_CONFIG[item.status].text}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[item.status].dot}`}></span>
@@ -87,7 +94,7 @@ const Capstone = () => {
               ))}
               {filteredData.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="p-6 text-center text-text-muted">Data tidak ditemukan.</td>
+                  <td colSpan="7" className="p-6 text-center text-text-muted">Data tidak ditemukan.</td>
                 </tr>
               )}
             </tbody>
@@ -98,4 +105,4 @@ const Capstone = () => {
   );
 };
 
-export default Capstone;
+export default Skripsi;
