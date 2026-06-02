@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Search, Filter, FileText, CheckCircle2, Clock, ChevronRight } from 'lucide-react';
+// import { Search, Filter, FileText, CheckCircle2, Clock, ChevronRight } from 'lucide-react';
 import { dummySkripsi } from '../data/skripsiData';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 
 // ============ [PAGE: SKRIPSI] ============
 // [KOMPONEN] Skripsi - Halaman pemantauan progres Skripsi eksklusif
@@ -34,7 +34,7 @@ const Skripsi = () => {
     <div className="space-y-6 animate-fade-in font-sans">
       <div>
         <h1 className="text-2xl font-extrabold text-accent2 flex items-center gap-2">
-          <FileText size={24} className="text-accent1" />
+          {/* <FileText size={24} className="text-accent1" /> */}
           Monitoring Skripsi
         </h1>
         <p className="text-sm text-text-muted mt-1">Pemantauan progres penyelesaian skripsi mahasiswa secara eksklusif</p>
@@ -43,7 +43,7 @@ const Skripsi = () => {
       <div className="card p-6">
         <div className="flex gap-4 mb-6 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+            {/* <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /> */}
             <input 
               type="text" 
               placeholder="Cari NIM atau Nama..." 

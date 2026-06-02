@@ -12,6 +12,7 @@ const MahasiswaDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profil');
+  const [selectedSemester, setSelectedSemester] = useState('1');
   
   const analytics = useStudentAnalytics(id);
 
@@ -25,7 +26,7 @@ const MahasiswaDetail = () => {
     );
   }
 
-  const { student, currentSemester, ipk, totalSks, totalSksKurikulum, riwayatNilai, sksTidakLulusList, totalSksTidakLulus, belumDiambil, estimasiKelulusan, prediksiRisiko, riwayatKhs, capstone, skripsi } = analytics;
+  const { student, currentSemester, ipk, totalSks, totalSksKurikulum, riwayatNilai, sksTidakLulusList, totalSksTidakLulus, belumDiambil, estimasiKelulusan, prediksiRisiko, aikStatus, riwayatKhs, capstone, skripsi } = analytics;
 
   const isOwner = user?.role === 'mahasiswa' && user?.nim === id;
 
@@ -134,8 +135,18 @@ const MahasiswaDetail = () => {
                   </div>
                   <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-lg">
                     <p className="text-xs font-bold text-yellow-800 mb-1">Catatan Evaluasi Semester Terakhir:</p>
-                    <p className="text-sm text-yellow-700">Mahasiswa menunjukkan progres yang stabil. Perlu meningkatkan partisipasi pada mata kuliah pilihan di semester berikutnya untuk mempercepat penyelesaian SKS.</p>
+                    <p className="text-sm text-yellow-700">
+                      {prediksiRisiko === 'Tepat Waktu' 
+                        ? 'Mahasiswa menunjukkan progres yang stabil. Lanjutkan performa akademik ini.' 
+                        : 'Terdapat indikator risiko keterlambatan. Disarankan untuk segera berkonsultasi dengan dosen pembimbing akademik.'}
+                    </p>
                   </div>
+                  {!aikStatus.isComplete && currentSemester >= 6 && (
+                    <div className="p-4 bg-red-50 border border-red-100 rounded-lg">
+                      <p className="text-xs font-bold text-red-800 mb-1 flex items-center gap-1"><AlertTriangle size={14}/> Perhatian Khusus:</p>
+                      <p className="text-sm text-red-700">Sertifikasi AIK belum lengkap — wajib diselesaikan sebelum pengajuan skripsi.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -158,6 +169,36 @@ const MahasiswaDetail = () => {
                     <span className="font-bold text-green-300">Lunas Semester Ini</span>
                   </li>
                 </ul>
+
+                {/* Status Sertifikasi AIK */}
+                <div className="mt-6 pt-5 border-t border-white/10 relative z-10">
+                  <h4 className="text-sm font-bold uppercase tracking-wider mb-3 flex items-center justify-between">
+                    Status Sertifikasi AIK
+                    <span className={`px-2 py-0.5 rounded text-[10px] ${aikStatus.isComplete ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'}`}>
+                      {aikStatus.isComplete ? 'AIK Lengkap' : 'AIK Belum Lengkap'}
+                    </span>
+                  </h4>
+                  <div className="mb-3">
+                    <div className="flex justify-between text-xs font-bold text-white/80 mb-1">
+                      <span>Progres Sertifikasi</span>
+                      <span>{aikStatus.totalSelesai} dari 4 selesai</span>
+                    </div>
+                    <div className="w-full bg-black/20 rounded-full h-2">
+                      <div className={`h-2 rounded-full transition-all duration-1000 ${aikStatus.isComplete ? 'bg-green-400' : 'bg-accent1'}`} style={{ width: `${(Math.min(4, aikStatus.totalSelesai) / 4) * 100}%` }}></div>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 text-xs">
+                    {aikStatus.detail.map((aik, idx) => (
+                      <li key={idx} className="flex justify-between items-center border-b border-white/5 pb-1">
+                        <span className="text-white/80">{aik.nama} <span className="opacity-50">({aik.jenis})</span></span>
+                        {aik.status === 'Lulus' ? <CheckCircle size={14} className="text-green-400" /> : <span className="text-red-400">{aik.status}</span>}
+                      </li>
+                    ))}
+                    {aikStatus.detail.length === 0 && (
+                      <li className="text-white/60 italic">Belum ada data sertifikasi AIK</li>
+                    )}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -167,33 +208,84 @@ const MahasiswaDetail = () => {
         {activeTab === 'riwayat nilai' && (
           <div className="space-y-6">
             <div className="card p-6">
-              <h3 className="text-lg font-bold text-accent2 mb-4">Mata Kuliah Yang Sudah Diambil</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-secondary/10 text-accent2 text-sm border-b border-secondary/20">
-                      <th className="p-3 font-semibold rounded-tl-lg">Kode MK</th>
-                      <th className="p-3 font-semibold">Nama Mata Kuliah</th>
-                      <th className="p-3 font-semibold text-center">Semester</th>
-                      <th className="p-3 font-semibold text-center">SKS</th>
-                      <th className="p-3 font-semibold text-center">Nilai</th>
-                      <th className="p-3 font-semibold text-center rounded-tr-lg">Bobot</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {riwayatNilai.map((item, idx) => (
-                      <tr key={idx} className="border-b border-secondary/10 hover:bg-secondary/5 text-sm">
-                        <td className="p-3 font-medium text-accent2">{item.kode}</td>
-                        <td className="p-3 font-semibold text-text-main">{item.nama}</td>
-                        <td className="p-3 text-center">{item.semester}</td>
-                        <td className="p-3 text-center">{item.sks}</td>
-                        <td className="p-3 text-center font-bold text-accent1">{item.nilai}</td>
-                        <td className="p-3 text-center text-text-muted">{item.bobot}</td>
-                      </tr>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <h3 className="text-lg font-bold text-accent2">Riwayat Nilai Mahasiswa</h3>
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-semibold text-text-muted">Pilih Semester:</label>
+                  <select 
+                    value={selectedSemester} 
+                    onChange={(e) => setSelectedSemester(e.target.value)}
+                    className="border border-secondary/30 rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent1"
+                  >
+                    {[1,2,3,4,5,6,7,8].map(s => (
+                      <option key={s} value={s.toString()}>Semester {s}</option>
                     ))}
-                  </tbody>
-                </table>
+                    <option value="Semua">Semua Semester</option>
+                  </select>
+                </div>
               </div>
+              
+              {(() => {
+                const filteredRiwayat = selectedSemester === 'Semua' 
+                  ? riwayatNilai 
+                  : riwayatNilai.filter(r => r.semester === parseInt(selectedSemester));
+                
+                const semSks = filteredRiwayat.reduce((a,c)=>a+c.sks, 0);
+                const semIp = semSks > 0 ? (filteredRiwayat.reduce((acc, curr) => acc + (curr.bobot * curr.sks), 0) / semSks).toFixed(2) : '0.00';
+
+                return (
+                  <>
+                    <div className="flex gap-4 mb-4">
+                      <div className="bg-secondary/5 px-4 py-2 rounded-lg border border-secondary/20">
+                        <span className="text-xs text-text-muted font-bold uppercase">Total MK</span>
+                        <p className="text-lg font-extrabold text-accent2">{filteredRiwayat.length}</p>
+                      </div>
+                      <div className="bg-secondary/5 px-4 py-2 rounded-lg border border-secondary/20">
+                        <span className="text-xs text-text-muted font-bold uppercase">SKS Semester</span>
+                        <p className="text-lg font-extrabold text-accent2">{semSks}</p>
+                      </div>
+                      <div className="bg-secondary/5 px-4 py-2 rounded-lg border border-secondary/20">
+                        <span className="text-xs text-text-muted font-bold uppercase">IP Semester</span>
+                        <p className="text-lg font-extrabold text-accent2">{semIp}</p>
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-secondary/10 text-accent2 text-sm border-b border-secondary/20">
+                            <th className="p-3 font-semibold rounded-tl-lg">No</th>
+                            <th className="p-3 font-semibold">Kode MK</th>
+                            <th className="p-3 font-semibold">Mata Kuliah</th>
+                            <th className="p-3 font-semibold text-center">Kelas</th>
+                            <th className="p-3 font-semibold text-center">W/P</th>
+                            <th className="p-3 font-semibold text-center">SKS</th>
+                            <th className="p-3 font-semibold text-center rounded-tr-lg">Nilai</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredRiwayat.map((item, idx) => (
+                            <tr key={idx} className="border-b border-secondary/10 hover:bg-secondary/5 text-sm">
+                              <td className="p-3 text-text-muted">{idx + 1}</td>
+                              <td className="p-3 font-medium text-accent2">{item.kode}</td>
+                              <td className="p-3 font-semibold text-text-main">{item.nama}</td>
+                              <td className="p-3 text-center">{item.kelas || '-'}</td>
+                              <td className="p-3 text-center font-medium text-accent1">{item.wp || 'W'}</td>
+                              <td className="p-3 text-center">{item.sks}</td>
+                              <td className="p-3 text-center font-bold text-accent1">{item.nilai}</td>
+                            </tr>
+                          ))}
+                          {filteredRiwayat.length === 0 && (
+                            <tr>
+                              <td colSpan="7" className="p-6 text-center text-text-muted">Tidak ada data untuk semester ini.</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             {sksTidakLulusList.length > 0 && (
@@ -270,39 +362,75 @@ const MahasiswaDetail = () => {
         {/* TAB: STATUS AKHIR */}
         {activeTab === 'status akhir' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="card p-6">
-              <h3 className="text-lg font-bold text-accent2 mb-6 flex items-center gap-2 border-b border-secondary/20 pb-4">
-                <BookOpen size={20} className="text-accent1" /> Status Capstone
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Judul Capstone</p>
-                  <p className="font-semibold text-accent2">{capstone.judul || '-'}</p>
+            <div className="space-y-6">
+              <div className="card p-6">
+                <h3 className="text-lg font-bold text-accent2 mb-6 flex items-center gap-2 border-b border-secondary/20 pb-4">
+                  <BookOpen size={20} className="text-accent1" /> Status Capstone
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Judul Capstone</p>
+                    <p className="font-semibold text-accent2">{capstone.judul || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Status Saat Ini</p>
+                    <span className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-xs font-bold border border-blue-200 inline-block">{capstone.status}</span>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Status Saat Ini</p>
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-xs font-bold border border-blue-200 inline-block">{capstone.status}</span>
+              </div>
+
+              <div className="card p-6">
+                <h3 className="text-lg font-bold text-accent2 mb-6 flex items-center gap-2 border-b border-secondary/20 pb-4">
+                  <FileText size={20} className="text-accent1" /> Status Skripsi
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Judul Skripsi</p>
+                    <p className="font-semibold text-accent2">{skripsi.judul || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Dosen Pembimbing</p>
+                    <p className="font-semibold text-text-main">{skripsi.dosenPembimbing || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Status Saat Ini</p>
+                    <span className="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-bold border border-indigo-200 inline-block">{skripsi.status}</span>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div className="card p-6">
+            
+            <div className="card p-6 h-fit border-t-4 border-t-accent2">
               <h3 className="text-lg font-bold text-accent2 mb-6 flex items-center gap-2 border-b border-secondary/20 pb-4">
-                <FileText size={20} className="text-accent1" /> Status Skripsi
+                <CheckCircle size={20} className="text-accent1" /> Kelengkapan Syarat Skripsi
               </h3>
               <div className="space-y-4">
-                <div>
-                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Judul Skripsi</p>
-                  <p className="font-semibold text-accent2">{skripsi.judul || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Dosen Pembimbing</p>
-                  <p className="font-semibold text-text-main">{skripsi.dosenPembimbing || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Status Saat Ini</p>
-                  <span className="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-bold border border-indigo-200 inline-block">{skripsi.status}</span>
-                </div>
+                {[
+                  { label: 'Telah melakukan Herregistrasi / Lunas', status: student.statusHerregistrasi },
+                  { label: 'Telah mengikuti KKN', status: student.statusKKN === 'Selesai' },
+                  { label: 'Lulus mata kuliah wajib teori & PPL', status: belumDiambil.length === 0 },
+                  { label: 'Sertifikasi 4 AIK Lengkap', status: aikStatus.isComplete },
+                  { label: 'Sertifikat Tes Baca Al-Qur\'an', status: student.sertifikatAlQuran },
+                  { label: 'Proposal Disetujui Pembimbing', status: skripsi.status !== 'Belum Mulai' }
+                ].map((syarat, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 bg-secondary/5 rounded-lg border border-secondary/10">
+                    <div className="mt-0.5">
+                      {syarat.status ? (
+                        <CheckCircle size={18} className="text-green-500" />
+                      ) : (
+                        <AlertTriangle size={18} className="text-yellow-500" />
+                      )}
+                    </div>
+                    <div>
+                      <p className={`text-sm font-semibold ${syarat.status ? 'text-accent2' : 'text-text-main'}`}>
+                        {syarat.label}
+                      </p>
+                      <p className="text-xs text-text-muted mt-1">
+                        {syarat.status ? 'Memenuhi Syarat' : 'Belum Terverifikasi / Belum Memenuhi'}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

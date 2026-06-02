@@ -51,10 +51,22 @@ export const AuthProvider = ({ children }) => {
     toast.success('Anda telah logout.');
   };
 
+  const updateUserProfile = (nama, email) => {
+    // [BACKEND] PUT /api/user/profile — Memperbarui data profil user yang sedang login.
+    if (user) {
+      const updatedUser = { ...user, name: nama, email: email };
+      setUser(updatedUser);
+      localStorage.setItem('uad_user', JSON.stringify(updatedUser));
+      return true;
+    }
+    return false;
+  };
+
   const value = {
     user,
     login,
     logout,
+    updateUserProfile,
     loading
   };
 

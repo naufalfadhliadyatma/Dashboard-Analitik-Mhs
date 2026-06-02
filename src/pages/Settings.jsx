@@ -91,7 +91,7 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
 );
 
 // ============ [KOMPONEN] InputField - Field input bergaya premium
-const InputField = ({ label, type = 'text', defaultValue, disabled, placeholder, icon: Icon }) => {
+const InputField = ({ label, type = 'text', value, onChange, disabled, placeholder, icon: Icon }) => {
   const [showPass, setShowPass] = useState(false);
   const isPass = type === 'password';
 
@@ -114,7 +114,8 @@ const InputField = ({ label, type = 'text', defaultValue, disabled, placeholder,
         )}
         <input
           type={isPass && showPass ? 'text' : type}
-          defaultValue={defaultValue}
+          value={value}
+          onChange={onChange}
           disabled={disabled}
           placeholder={placeholder}
           style={{
@@ -219,23 +220,47 @@ const SectionCard = ({ title, subtitle, icon: Icon, children }) => (
 // ============ [PAGE SECTION] ============
 // [KOMPONEN] Settings - Halaman pengaturan preferensi akun pengguna
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, updateUserProfile } = useAuth();
   const [activeNav, setActiveNav] = useState('profil');
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [nama, setNama] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || 'admin@uad.ac.id');
+
+  const toastStyle = {
+    style: {
+      background: T.navy,
+      color: '#fff',
+      borderRadius: '12px',
+      fontFamily: "'Poppins', system-ui",
+      fontSize: '13.5px',
+      fontWeight: 600,
+      boxShadow: '0 8px 24px rgba(6,68,107,0.25)',
+    },
+    iconTheme: { primary: T.sky, secondary: T.navy },
+  };
+
+  const handleSaveProfile = () => {
+    if (!nama.trim() || !email.trim()) {
+      toast.error('Nama dan Email tidak boleh kosong.', toastStyle);
+      return;
+    }
+    const success = updateUserProfile(nama, email);
+    if (success) {
+      setIsEditing(false);
+      toast.success('Profil berhasil diperbarui!', toastStyle);
+    }
+  };
+
+  const handleCancel = () => {
+    setNama(user?.name || '');
+    setEmail(user?.email || 'admin@uad.ac.id');
+    setIsEditing(false);
+  };
 
   // [BACKEND] PUT /api/users/settings - Update user preferences
   const handleSave = () => {
-    toast.success('Pengaturan berhasil disimpan!', {
-      style: {
-        background: T.navy,
-        color: '#fff',
-        borderRadius: '12px',
-        fontFamily: "'Poppins', system-ui",
-        fontSize: '13.5px',
-        fontWeight: 600,
-        boxShadow: '0 8px 24px rgba(6,68,107,0.25)',
-      },
-      iconTheme: { primary: T.sky, secondary: T.navy },
-    });
+    toast.success('Pengaturan berhasil disimpan!', toastStyle);
   };
 
   return (
@@ -401,10 +426,10 @@ const Settings = () => {
                   <SectionCard title="Informasi Dasar" subtitle="Nama, email, dan data akun utama" icon={User}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <InputField label="Nama Lengkap" defaultValue={user?.name} icon={User} />
-                        <InputField label="Role" defaultValue={user?.role} disabled icon={Shield} />
+                        <InputField label="Nama Lengkap" value={nama} onChange={(e) => setNama(e.target.value)} disabled={!isEditing} icon={User} />
+                        <InputField label="Role" value={user?.role} disabled icon={Shield} />
                       </div>
-                      <InputField label="Alamat Email" type="email" defaultValue="admin@uad.ac.id" icon={Mail} />
+                      <InputField label="Alamat Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isEditing} icon={Mail} />
 
                       {/* Divider */}
                       <div style={{
@@ -413,31 +438,57 @@ const Settings = () => {
                       }} />
 
                       {/* Save button */}
-                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <button
-                          onClick={handleSave}
-                          style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '8px',
-                            padding: '11px 26px', borderRadius: '14px', fontSize: '13.5px',
-                            fontWeight: 700, cursor: 'pointer', letterSpacing: '-0.1px',
-                            background: `linear-gradient(135deg, ${T.mid} 0%, ${T.navy} 100%)`,
-                            color: T.white, border: 'none',
-                            boxShadow: '0 4px 18px rgba(6,68,107,0.30)',
-                            transition: 'transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease',
-                            fontFamily: "'Poppins', system-ui",
-                          }}
-                          onMouseEnter={e => {
-                            e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                            e.currentTarget.style.boxShadow = '0 10px 26px rgba(6,68,107,0.38)';
-                          }}
-                          onMouseLeave={e => {
-                            e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                            e.currentTarget.style.boxShadow = '0 4px 18px rgba(6,68,107,0.30)';
-                          }}
-                        >
-                          <Save size={15} strokeWidth={2.5} />
-                          Simpan Perubahan
-                        </button>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                        {!isEditing ? (
+                          <button
+                            onClick={() => setIsEditing(true)}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '8px',
+                              padding: '11px 26px', borderRadius: '14px', fontSize: '13.5px',
+                              fontWeight: 700, cursor: 'pointer', letterSpacing: '-0.1px',
+                              background: `linear-gradient(135deg, ${T.mid} 0%, ${T.navy} 100%)`,
+                              color: T.white, border: 'none',
+                              boxShadow: '0 4px 18px rgba(6,68,107,0.30)',
+                              transition: 'transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease',
+                              fontFamily: "'Poppins', system-ui",
+                            }}
+                          >
+                            Ubah Profil
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              onClick={handleCancel}
+                              style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                                padding: '11px 26px', borderRadius: '14px', fontSize: '13.5px',
+                                fontWeight: 700, cursor: 'pointer', letterSpacing: '-0.1px',
+                                background: 'transparent',
+                                color: T.navy, border: `1.5px solid ${T.mid}`,
+                                transition: 'all 0.2s',
+                                fontFamily: "'Poppins', system-ui",
+                              }}
+                            >
+                              Batal
+                            </button>
+                            <button
+                              onClick={handleSaveProfile}
+                              style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                                padding: '11px 26px', borderRadius: '14px', fontSize: '13.5px',
+                                fontWeight: 700, cursor: 'pointer', letterSpacing: '-0.1px',
+                                background: `linear-gradient(135deg, ${T.mid} 0%, ${T.navy} 100%)`,
+                                color: T.white, border: 'none',
+                                boxShadow: '0 4px 18px rgba(6,68,107,0.30)',
+                                transition: 'transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease',
+                                fontFamily: "'Poppins', system-ui",
+                              }}
+                            >
+                              <Save size={15} strokeWidth={2.5} />
+                              Simpan Perubahan
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </SectionCard>

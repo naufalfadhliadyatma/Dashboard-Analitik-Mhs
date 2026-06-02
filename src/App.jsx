@@ -31,6 +31,9 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
         <Routes>
+          {/* Root Redirect to Login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
           {/* Public Routes */}
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<Login />} />
@@ -40,7 +43,6 @@ function App() {
           {/* Protected Routes */}
           <Route element={<PrivateRoute />}>
             <Route element={<SidebarLayout />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/upload" element={<Upload />} />
               <Route path="/evaluasi-studi" element={<EvaluasiStudi />} />

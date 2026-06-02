@@ -16,6 +16,7 @@ import {
   UserCheck,
   User
 } from 'lucide-react';
+import logoUAD from '../assets/logo-uad.png';
 
 // ============ [LAYOUT SECTION] ============
 // [KOMPONEN] SidebarLayout - Layout utama aplikasi dengan Sidebar navigasi dan area konten
@@ -61,9 +62,9 @@ const SidebarLayout = () => {
         fixed md:static inset-y-0 left-0 z-40
         w-64 bg-accent2 text-white flex flex-col shadow-xl
       `}>
-        {/* Logo Area */}
+        {/* ========Logo Area======== */}
         <div className="p-6 flex justify-center items-center border-b border-white/10">
-          <img src="src/assets/logo-uad.png" alt="Logo UADD" className="h-20 w-auto object-contain bg-white-0 p-0 rounded-lg" />
+          <img src={logoUAD} alt="Logo UAD" className="h-20 w-auto object-contain bg-white-0 p-0 rounded-lg" />
         </div>
 
         {/* Navigation */}
