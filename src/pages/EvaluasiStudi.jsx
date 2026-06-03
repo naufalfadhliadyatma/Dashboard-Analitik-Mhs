@@ -222,12 +222,11 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       background: linear-gradient(90deg, rgba(6,68,107,0.04) 0%, rgba(156,205,219,0.08) 100%);
     }
     .es-table thead th {
-      padding: 13px 20px;
+      padding: 14px 20px;
       font-family: 'Poppins', sans-serif;
-      font-size: 10.5px;
+      font-size: 13.5px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.9px;
+      text-align: left;
       color: var(--col-blue);
       white-space: nowrap;
       border-bottom: 1px solid var(--col-border);
@@ -256,8 +255,8 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       font-weight: 500;
       color: #1e3a4f;
     }
-    .es-center { text-align: center; }
-    .es-right { text-align: right; }
+    .es-center { text-align: center !important; }
+    .es-right { text-align: right !important; }
     .es-ipk {
       font-family: 'Poppins', sans-serif;
       font-weight: 700;
@@ -633,7 +632,7 @@ const EvaluasiStudi = () => {
                 <th className="es-center">IPK</th>
                 <th className="es-center">SKS</th>
                 <th>Status</th>
-                <th className="es-right">Aksi</th>
+                <th className="es-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -647,13 +646,19 @@ const EvaluasiStudi = () => {
                       <span className={getIpkClass(mhs.ipk)}>{mhs.ipk.toFixed(2)}</span>
                     </td>
                     <td className="es-center" style={{ fontWeight:500 }}>{mhs.sks}</td>
-                    <td>{getStatusBadge(mhs.status)}</td>
-                    <td className="es-right">
-                      <Link to={`/mahasiswa/${mhs.nim}`} className="es-detail-link">
-                        <Eye size={13} />
-                        Detail
-                        <ArrowUpRight size={12} />
-                      </Link>
+                    <td>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', height: '100%' }}>
+                        {getStatusBadge(mhs.status)}
+                      </div>
+                    </td>
+                    <td className="es-center">
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                        <Link to={`/mahasiswa/${mhs.nim}`} className="es-detail-link">
+                          <Eye size={13} />
+                          Detail
+                          <ArrowUpRight size={12} />
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))
