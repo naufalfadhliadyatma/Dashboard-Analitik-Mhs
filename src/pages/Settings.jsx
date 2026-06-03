@@ -292,7 +292,7 @@ const Settings = () => {
               fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em',
               textTransform: 'uppercase', color: T.mid, marginBottom: '4px',
             }}>
-              Konfigurasi
+              {/* Konfigurasi */}
             </p>
             <h1 style={{
               fontSize: '26px', fontWeight: 800, color: T.navy,
@@ -301,7 +301,7 @@ const Settings = () => {
               Pengaturan Akun
             </h1>
             <p style={{ fontSize: '13px', color: T.muted, marginTop: '5px', fontWeight: 450 }}>
-              Kelola informasi profil dan preferensi sistem Anda
+              Kelola informasi profil sistem Anda
             </p>
           </div>
 
@@ -365,7 +365,7 @@ const Settings = () => {
               {activeNav === 'profil' && (
                 <>
                   {/* Avatar section */}
-                  <SectionCard title="Foto Profil" subtitle="Tampil di seluruh halaman aplikasi" icon={Camera}>
+                  <SectionCard title="Foto Profil" subtitle="" icon={Camera}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                       {/* Avatar preview */}
                       <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -553,9 +553,9 @@ const Settings = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                     {[
                       { label: 'Mahasiswa Berisiko Baru',      desc: 'Notifikasi saat ada mahasiswa baru masuk kategori berisiko', checked: true },
-                      { label: 'Update Status Capstone',       desc: 'Pemberitahuan perubahan status skripsi/capstone mahasiswa',  checked: true },
+                      { label: 'Update Status Capstone & Skripsi',       desc: 'Pemberitahuan perubahan status skripsi & capstone mahasiswa',  checked: true },
                       { label: 'Laporan Mingguan',             desc: 'Ringkasan performa akademik setiap akhir pekan',             checked: false },
-                      { label: 'Upload CSV Berhasil',          desc: 'Konfirmasi setelah proses import data selesai',               checked: true },
+                      { label: 'Upload KHS Berhasil',          desc: 'Konfirmasi setelah proses import data selesai',               checked: true },
                     ].map((item, i, arr) => (
                       <div
                         key={item.label}

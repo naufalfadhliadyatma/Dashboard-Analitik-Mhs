@@ -46,10 +46,11 @@ export const dummyMahasiswa = [
 ];
 
 export const dummyPembimbing = [
-  { id: "D01", nama: "Dr. Fathur Rahman, M.Kom.", bebanBimbingan: 8, kuota: 10 },
-  { id: "D02", nama: "Rini Astuti, S.T., M.Cs.", bebanBimbingan: 10, kuota: 10 },
-  { id: "D03", nama: "Andi Wijaya, M.Eng.", bebanBimbingan: 4, kuota: 12 },
+  { id: "D01", nama: "Dr. Arif Rahman, M.Kom", bebanBimbingan: 8, kuota: 10 },
+  { id: "D02", nama: "Iwan Tri Riadi Yanto,S.Si, M.T., Ph.D", bebanBimbingan: 10, kuota: 10 },
+  { id: "D03", nama: "Prof. Dr. Imam Riadi,M.Kom", bebanBimbingan: 4, kuota: 12 },
 ];
+
 
 export const dummyChartData = {
   gpaTrend: [

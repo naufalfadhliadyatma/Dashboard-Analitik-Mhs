@@ -540,7 +540,7 @@ const EvaluasiStudi = () => {
         <div>
           <div className="es-title-pill">Akademik</div>
           <h1 className="es-page-title">Evaluasi Studi Mahasiswa</h1>
-          <p className="es-page-sub">Pantau dan analisis status akademik seluruh mahasiswa program studi</p>
+          <p className="es-page-sub">Pantau dan analisis status akademik seluruh mahasiswa program studi Sistem Informasi</p>
           <div className="es-header-line" />
         </div>
         <div style={{ display:'flex', gap:'8px' }}>
