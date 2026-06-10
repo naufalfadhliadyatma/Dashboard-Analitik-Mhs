@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Search, Download, Filter, ChevronLeft, ChevronRight, Users, TrendingUp, AlertTriangle, GraduationCap, ArrowUpRight, Eye } from 'lucide-react';
 import { dummyMahasiswa } from '../data/dummy';
+import { dummySkripsi } from '../data/skripsiData';
+import { cekStatusSkripsi } from '../utils/evaluasiUtils';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+
+// [BACKEND] GET /api/evaluasi-studi — Mengambil semua data mahasiswa beserta status evaluasi yang dihitung server berdasarkan data KHS terbaru yang diupload
+// [BACKEND] POST /api/evaluasi-studi/recalculate/:nim — Memicu recalculation status evaluasi mahasiswa tertentu setelah KHS baru diupload dan diverifikasi
+// Catatan: Status evaluasi wajib diperbarui secara otomatis setiap kali mahasiswa berhasil mengupload dan KHS-nya diverifikasi.
 
 // ============ [PAGE SECTION] ============
 // [KOMPONEN] EvaluasiStudi - Redesigned with world-class enterprise SaaS aesthetics
@@ -280,15 +286,18 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .es-badge-aktif   { background: rgba(22,163,74,0.1);   color: #15803d; border: 1px solid rgba(22,163,74,0.2); }
-    .es-badge-aktif .es-badge-dot   { background: #16a34a; box-shadow: 0 0 0 2px rgba(22,163,74,0.2); }
-    .es-badge-berisiko { background: rgba(220,38,38,0.1);  color: #b91c1c; border: 1px solid rgba(220,38,38,0.2); }
-    .es-badge-berisiko .es-badge-dot { background: #dc2626; box-shadow: 0 0 0 2px rgba(220,38,38,0.2); }
-    .es-badge-evaluasi { background: rgba(234,88,12,0.1);  color: #c2410c; border: 1px solid rgba(234,88,12,0.2); }
-    .es-badge-evaluasi .es-badge-dot { background: #ea580c; box-shadow: 0 0 0 2px rgba(234,88,12,0.2); }
-    .es-badge-lulus   { background: rgba(87,144,171,0.12); color: var(--col-navy); border: 1px solid rgba(87,144,171,0.25); }
-    .es-badge-lulus .es-badge-dot   { background: var(--col-blue); }
-    .es-badge-default { background: rgba(100,116,139,0.1); color: #475569; border: 1px solid rgba(100,116,139,0.2); }
+    .es-badge-lolos   { background: #dcfce7; color: #15803d; border: 1px solid rgba(22,163,74,0.2); }
+    .es-badge-lolos .es-badge-dot   { background: #16a34a; box-shadow: 0 0 0 2px rgba(22,163,74,0.2); }
+    .es-badge-kondisional { background: #fef9c3; color: #a16207; border: 1px solid rgba(234,179,8,0.2); }
+    .es-badge-kondisional .es-badge-dot { background: #eab308; box-shadow: 0 0 0 2px rgba(234,179,8,0.2); }
+    .es-badge-do { background: #fee2e2;  color: #b91c1c; border: 1px solid rgba(220,38,38,0.2); }
+    .es-badge-do .es-badge-dot { background: #dc2626; box-shadow: 0 0 0 2px rgba(220,38,38,0.2); }
+    .es-badge-belum { background: #f3f4f6; color: #4b5563; border: 1px solid rgba(156,163,175,0.2); }
+    .es-badge-belum .es-badge-dot { background: #9ca3af; }
+    .es-badge-aktif-normal { background: #dbeafe; color: #1d4ed8; border: 1px solid rgba(59,130,246,0.2); }
+    .es-badge-aktif-normal .es-badge-dot { background: #3b82f6; }
+    .es-badge-skripsi-orange { background: #ffedd5; color: #c2410c; border: 1px solid rgba(249,115,22,0.2); }
+    .es-badge-skripsi-orange .es-badge-dot { background: #f97316; }
 
     /* ─── Detail link ─── */
     .es-detail-link {
@@ -473,18 +482,25 @@ const EvaluasiStudi = () => {
   const lulus     = dummyMahasiswa.filter(m => m.status === 'Lulus').length;
 
   /* ── Badge renderer ── */
-  const getStatusBadge = (status) => {
+  const getEvaluasiBadge = (status) => {
     const map = {
-      'Aktif':    ['es-badge-aktif',    status],
-      'Berisiko': ['es-badge-berisiko', status],
-      'Evaluasi': ['es-badge-evaluasi', status],
-      'Lulus':    ['es-badge-lulus',    status],
+      'Lolos ES-1': 'es-badge-lolos',
+      'Lolos ES-2': 'es-badge-lolos',
+      'Lolos ES-3': 'es-badge-lolos',
+      'Aktif Normal': 'es-badge-aktif-normal',
+      'Kondisional ES-1': 'es-badge-kondisional',
+      'Kondisional ES-2': 'es-badge-kondisional',
+      'Drop Out ES-1': 'es-badge-do',
+      'Drop Out ES-2': 'es-badge-do',
+      'Drop Out ES-3': 'es-badge-do',
+      'Gugur Studi': 'es-badge-do',
+      'Belum Evaluasi': 'es-badge-belum',
     };
-    const [cls, label] = map[status] || ['es-badge-default', status];
+    const cls = map[status] || 'es-badge-belum';
     return (
       <span className={`es-badge ${cls}`}>
         <span className="es-badge-dot" />
-        {label}
+        {status}
       </span>
     );
   };
@@ -518,7 +534,7 @@ const EvaluasiStudi = () => {
       bg: 'linear-gradient(135deg,#fee2e2,#fecaca)',
       color: '#b91c1c',
       val: berisiko + evaluasi,
-      label: 'Perlu Perhatian',
+      label: 'Perlu Evaluasi',
       trend: `${berisiko} Berisiko · ${evaluasi} Evaluasi`,
     },
     {
@@ -598,7 +614,7 @@ const EvaluasiStudi = () => {
               >
                 <option value="Semua">Semua Status</option>
                 <option value="Aktif">Aktif</option>
-                <option value="Berisiko">Berisiko</option>
+                <option value="Tidak Aktif">Tidak Aktif</option>
                 <option value="Evaluasi">Evaluasi</option>
                 <option value="Lulus">Lulus</option>
               </select>
@@ -648,7 +664,7 @@ const EvaluasiStudi = () => {
                     <td className="es-center" style={{ fontWeight:500 }}>{mhs.sks}</td>
                     <td>
                       <div style={{ display: 'inline-flex', alignItems: 'center', height: '100%' }}>
-                        {getStatusBadge(mhs.status)}
+                        {getEvaluasiBadge(mhs.evaluasiStatus)}
                       </div>
                     </td>
                     <td className="es-center">

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Users, GraduationCap, AlertTriangle, TrendingUp, ArrowUpRight, ArrowDownRight, Sparkles, Filter } from 'lucide-react';
-import { dummyChartData } from '../data/dummy';
+import { dummyChartData, dummyMahasiswa } from '../data/dummy';
+import { dummySkripsi } from '../data/skripsiData';
+import { hitungPersentaseLulusTepatWaktu } from '../utils/dashboardUtils';
 import GpaTrendChart from '../components/charts/GpaTrendChart';
 import GradStatusChart from '../components/charts/GradStatusChart';
 import ProblematicCoursesChart from '../components/charts/ProblematicCoursesChart';
@@ -303,6 +305,8 @@ const SectionLabel = ({ label, delay }) => {
 const Dashboard = () => {
   const [filterAngkatan, setFilterAngkatan] = useState('Semua');
 
+  const persentaseLulusTepatWaktu = hitungPersentaseLulusTepatWaktu(dummyMahasiswa, dummySkripsi);
+
   const statsData = [
     {
       title: 'Total Mahasiswa Aktif',
@@ -330,10 +334,10 @@ const Dashboard = () => {
     },
     {
       title: 'Lulus Tepat Waktu',
-      value: '68%',
+      value: `${persentaseLulusTepatWaktu}%`,
       icon: GraduationCap,
       trend: -1.2,
-      trendLabel: 'dari tahun lalu',
+      trendLabel: 'Berdasarkan mahasiswa yang lulus ≤ 8 semester',
       accent: {
         blob: 'rgba(156,205,219,0.9)',
         iconBg: 'rgba(156,205,219,0.22)',

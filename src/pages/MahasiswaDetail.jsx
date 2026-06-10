@@ -121,6 +121,10 @@ const MahasiswaDetail = () => {
                 </h3>
                 <div className="space-y-5">
                   <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-text-muted">Tahap Evaluasi</span>
+                    <span className="font-bold text-accent2 bg-secondary/10 px-3 py-1 rounded-full text-xs">{student.evaluasiStatus || 'Belum Evaluasi'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
                     <span className="text-sm font-semibold text-text-muted">Prediksi Risiko Studi</span>
                     {getRisikoBadge(prediksiRisiko)}
                   </div>
@@ -134,12 +138,14 @@ const MahasiswaDetail = () => {
                     </div>
                   </div>
                   <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-lg">
-                    <p className="text-xs font-bold text-yellow-800 mb-1">Catatan Evaluasi Semester Terakhir:</p>
+                    <div className="flex justify-between items-center mb-1">
+                      <p className="text-xs font-bold text-yellow-800">Pemicu Status Evaluasi:</p>
+                      <span className="text-[10px] text-yellow-700 bg-yellow-200/50 px-2 py-0.5 rounded">Update: {student.tanggalUpdateStatus || '-'}</span>
+                    </div>
                     <p className="text-sm text-yellow-700">
-                      {prediksiRisiko === 'Tepat Waktu' 
-                        ? 'Mahasiswa menunjukkan progres yang stabil. Lanjutkan performa akademik ini.' 
-                        : 'Terdapat indikator risiko keterlambatan. Disarankan untuk segera berkonsultasi dengan dosen pembimbing akademik.'}
+                      {student.evaluasiPemicu || 'Studi berjalan normal sesuai dengan parameter angkatan saat ini.'}
                     </p>
+                    <p className="text-xs text-yellow-800 mt-2 font-semibold">Total SKS (≥ C): {student.sksDenganNilaiMinC} SKS</p>
                   </div>
                   {!aikStatus.isComplete && currentSemester >= 6 && (
                     <div className="p-4 bg-red-50 border border-red-100 rounded-lg">
